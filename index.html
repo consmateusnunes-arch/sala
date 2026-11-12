@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sala</title>
+<link rel="icon" href="favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
@@ -102,6 +103,48 @@ body.sem-registro .registro{display:none}
 .registro header p{margin:2px 0 0;color:var(--suave);font-size:12.5px}
 .registro .fechar{background:none;border:0;color:var(--suave);cursor:pointer;padding:4px;display:none}
 .registro .aviso-sr{background:#FBEFD8;color:#6B4705;font-size:12.5px;padding:8px 20px}
+.abas{display:flex;gap:2px;margin-top:10px}
+.abas button{border:0;background:none;padding:6px 10px 8px;font-weight:600;font-size:13.5px;color:var(--suave);cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px}
+.abas button.ativo{color:var(--texto);border-bottom-color:var(--tinta)}
+.abas .cont{min-width:18px;height:18px;border-radius:9px;background:var(--lacre);color:#fff;font-size:11px;display:inline-grid;place-items:center;padding:0 5px}
+.painel-aba{flex:1;display:flex;flex-direction:column;min-height:0}
+.chat-lista{flex:1;overflow-y:auto;padding:14px 18px}
+.msg{margin:0 0 12px}
+.msg .quem{font-weight:600;font-size:13px;color:var(--tinta)}
+.msg.minha .quem{color:#2F7D5B}
+.msg .h{font-size:11.5px;color:#9AA3B2;margin-left:6px}
+.msg p{margin:2px 0 0;font-size:14.5px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+.msg.pend{opacity:.55}
+.chat-form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #E3E7EF;background:#fff}
+.chat-form textarea{flex:1;resize:none;border:1px solid #DCE2EC;border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;color:var(--texto);height:42px;max-height:110px}
+.chat-form textarea:focus{outline:none;border-color:var(--tinta);box-shadow:0 0 0 3px #E8EDFB}
+.chat-form button{border:0;border-radius:8px;background:var(--tinta);color:#fff;font-weight:600;padding:0 14px;cursor:pointer}
+.pessoas{flex:1;overflow-y:auto;padding:6px 18px 14px}
+.modo{background:#F3F5F9;border-radius:10px;padding:12px;margin:10px 0 6px}
+.modo p{margin:0 0 8px;font-size:12.5px;color:var(--suave)}
+.seg{display:flex;background:#fff;border:1px solid #DCE2EC;border-radius:8px;padding:2px}
+.seg button{flex:1;border:0;background:none;border-radius:6px;padding:6px;font-weight:600;font-size:13px;color:var(--suave);cursor:pointer}
+.seg button.ativo{background:var(--tinta);color:#fff}
+.btn-p{border:1px solid #DCE2EC;background:#fff;color:var(--texto);border-radius:7px;padding:5px 10px;font-weight:600;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.btn-p:hover{border-color:#B9C3D4}
+.btn-p.lib{background:var(--tinta);border-color:var(--tinta);color:#fff}
+.btn-p.blo{color:var(--lacre);border-color:#EBC4C0}
+.btn-p.cheio{width:100%;margin-top:8px}
+.pessoa{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #EEF1F5}
+.pessoa .ini{width:34px;height:34px;border-radius:50%;background:#E8EDFB;color:var(--tinta);display:grid;place-items:center;font-weight:700;font-size:12.5px;flex:none}
+.pessoa .info{flex:1;min-width:0}
+.pessoa .info b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.selos{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.selo{font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;background:#F0F2F6;color:var(--suave)}
+.selo.ok{background:#E2F1E9;color:#2F7D5B}
+.selo.alerta{background:#FBE7E5;color:#B3261E}
+.selo.mao{background:#FBEFD8;color:#8F5E07}
+.tile .mao-tile{position:absolute;top:10px;left:10px;background:#F2C46D;color:#3A2A05;font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:6px;display:none}
+.tile.mao .mao-tile{display:block}
+.ctl{position:relative}
+.ctl .ponto{position:absolute;top:4px;right:4px;min-width:16px;height:16px;border-radius:8px;background:var(--lacre);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.ctl.travado{background:#4A3A3A;color:#C9A9A6}
+.ctl.mao-on{background:#F2C46D;color:#3A2A05}
 .folha{
   --l:30px;flex:1;overflow-y:auto;
   background-image:
@@ -145,7 +188,7 @@ body.sem-registro .registro{display:none}
 <body>
 
 <!-- Carregando / erro / fim -->
-<div id="telaEstado" class="estado"><div><p class="marca">Sala</p><h1 id="estTit">Abrindo a sala…</h1><p id="estMsg"></p></div></div>
+<div id="telaEstado" class="estado"><div><p class="marca"><img src="logo-sala.png" alt="Sala" style="width:min(320px,80vw);height:auto;filter:brightness(0) invert(1)"></p><h1 id="estTit">Abrindo a sala…</h1><p id="estMsg"></p></div></div>
 
 <!-- Antes de entrar -->
 <div id="telaPre" class="pre oculto">
@@ -181,7 +224,7 @@ body.sem-registro .registro{display:none}
 <!-- Reunião -->
 <div id="telaSala" class="sala oculto">
   <div class="topo">
-    <span class="marca">Sala</span>
+    <span class="marca"><img src="icone-sala.png" alt="" style="height:26px;vertical-align:-6px;margin-right:6px">Sala</span>
     <span class="tit" id="salaTit"></span>
     <span class="tempo" id="tempo"></span>
   </div>
@@ -190,17 +233,32 @@ body.sem-registro .registro{display:none}
     <button class="ctl" id="cMic" title="Microfone"></button>
     <button class="ctl" id="cCam" title="Câmera"></button>
     <button class="ctl" id="cTela" title="Apresentar a tela"></button>
-    <button class="ctl ativo" id="cReg" title="Registro ao vivo"></button>
+    <button class="ctl oculto" id="cMao" title="Levantar a mão"></button>
+    <button class="ctl" id="cChat" title="Chat"></button>
+    <button class="ctl ativo" id="cReg" title="Registro e participantes"></button>
     <button class="ctl" id="cLink" title="Copiar link da reunião"></button>
     <button class="ctl sair" id="cSair" title="Sair da reunião"></button>
   </div>
   <section class="registro" aria-label="Registro ao vivo">
-    <header>
-      <div><h2>Registro ao vivo</h2><p>Sua fala entra aqui enquanto o microfone estiver ligado.</p></div>
-      <button class="fechar" id="fecharReg" title="Fechar registro"></button>
+    <header style="padding-bottom:0">
+      <div style="flex:1;min-width:0"><h2 id="abaTit">Registro ao vivo</h2><p id="abaSub">Sua fala entra aqui enquanto o microfone estiver ligado.</p>
+        <nav class="abas">
+          <button data-aba="registro" class="ativo">Registro</button>
+          <button data-aba="chat">Chat <span class="cont oculto" id="contChat"></span></button>
+          <button data-aba="pessoas">Pessoas <span class="cont oculto" id="contMao"></span></button>
+        </nav>
+      </div>
+      <button class="fechar" id="fecharReg" title="Fechar painel"></button>
     </header>
-    <div class="aviso-sr oculto" id="avisoSR">Este navegador não transcreve fala. Use Chrome ou Edge no computador para que suas falas entrem no documento.</div>
-    <div class="folha" id="folha"><p class="vazio" id="folhaVazia">As falas aparecem aqui assim que alguém começar a falar.</p><p class="interim" id="interim"></p></div>
+    <div class="painel-aba" id="abaRegistro">
+      <div class="aviso-sr oculto" id="avisoSR">Este navegador não transcreve fala. Use Chrome ou Edge no computador para que suas falas entrem no documento. Você pode escrever no chat.</div>
+      <div class="folha" id="folha"><p class="vazio" id="folhaVazia">As falas aparecem aqui assim que alguém começar a falar.</p><p class="interim" id="interim"></p></div>
+    </div>
+    <div class="painel-aba oculto" id="abaChat">
+      <div class="chat-lista" id="chatLista"><p class="vazio" id="chatVazio" style="color:#8C94A3;font-style:italic;margin:0">Perguntas e avisos por escrito. As mensagens também entram no documento.</p></div>
+      <form class="chat-form" id="fChat"><textarea id="chatTxt" maxlength="500" placeholder="Escreva uma mensagem" aria-label="Mensagem"></textarea><button type="submit">Enviar</button></form>
+    </div>
+    <div class="painel-aba oculto" id="abaPessoas"><div class="pessoas" id="pessoas"></div></div>
   </section>
 </div>
 
@@ -225,6 +283,8 @@ const S = {
   info: null, peer: null, host: false, nome: '', email: '', cargo: '',
   stream: new MediaStream(), tela: null, mic: false, cam: false, temMic: false, temCam: false,
   ultimaSeq: 0, saida: [], falasPend: [], presenca: [], conns: new Map(),
+  ultimoChat: 0, chatPend: [], chatEnviando: [], naoLidas: 0, aba: 'registro',
+  ctl: { modo: 'livre', lib: {}, mudo: {} }, podeFalar: true, mao: false, ultMudo: 0, maos: new Set(),
   dentro: false, fim: false, falhas: 0, entrouEm: 0,
   rec: null, recAtivo: false, recBloqueado: false
 };
@@ -239,6 +299,8 @@ const I = {
   reg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7"/><path d="M9 15h7"/><path d="M9 7h3"/></svg>',
   link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>',
   sair: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 14.5c4.7-4.2 12.3-4.2 17 0l-1.8 2.6-3.9-1.1v-2.6a9.5 9.5 0 0 0-5.6 0V16l-3.9 1.1z"/></svg>',
+  mao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12"/><path d="M11 11.5v-8a1.5 1.5 0 0 1 3 0V12"/><path d="M14 11.5V6a1.5 1.5 0 0 1 3 0v8.5a6.5 6.5 0 0 1-6.5 6.5h-.6a6 6 0 0 1-4.6-2.2L3.6 16a1.5 1.5 0 0 1 2.3-1.9L8 16.2"/></svg>',
+  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>',
   x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
 };
 
@@ -246,11 +308,41 @@ const I = {
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 function iniciais(n) { return String(n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join('').toUpperCase(); }
 function tipoLabel(t) { return ({ 'Ata': 'Ata', 'Relatório': 'Relatório', 'Reunião': 'Resumo de reunião' })[t] || t; }
-async function api(corpo) {
-  const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(corpo) });
-  const j = await r.json();
+async function api(corpo, opcoes) {
+  const url = API_URL + '?d=' + encodeURIComponent(JSON.stringify(corpo)) + '&_=' + Date.now();
+  const r = await fetch(url, Object.assign({ method: 'GET' }, opcoes || {}));
+  const txt = await r.text();
+  let j;
+  try { j = JSON.parse(txt); }
+  catch (e) {
+    const t = (txt.match(/<title>([^<]*)/i) || [])[1];
+    throw new Error('O servidor da Sala respondeu de forma inesperada' + (t ? ' (' + t.trim() + ')' : '') + '.');
+  }
   if (!j.ok) throw new Error(j.erro || 'O servidor da Sala não respondeu.');
   return j;
+}
+/* Sinais de vídeo são grandes: vão em pedaços, todos ao mesmo tempo */
+async function enviarSinal(para, data) {
+  const txt = JSON.stringify(data), TAM = 1400;
+  const n = Math.ceil(txt.length / TAM);
+  const id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const envios = [];
+  for (let i = 0; i < n; i++) {
+    envios.push(enviarParte({ action: 'parte', sala: SALA, peer: S.peer, to: para, id, i, n, txt: txt.slice(i * TAM, (i + 1) * TAM) }));
+  }
+  await Promise.all(envios);
+}
+async function enviarParte(corpo) {
+  for (let t = 0; t < 4; t++) {
+    try { await api(corpo); return; }
+    catch (e) { await new Promise(r => setTimeout(r, 700 * (t + 1))); }
+  }
+}
+function pegarFalas() {
+  const out = [];
+  let total = 0;
+  while (S.falasPend.length && total < 1200) { const f = S.falasPend.shift(); out.push(f); total += f.length; }
+  return out;
 }
 function mostrar(qual) { ['telaEstado', 'telaPre', 'telaSala'].forEach(id => $(id).classList.toggle('oculto', id !== qual)); }
 function telaEstado(tit, msg) { $('estTit').textContent = tit; $('estMsg').textContent = msg || ''; mostrar('telaEstado'); }
@@ -354,23 +446,30 @@ async function entrar(ev) {
 function montarSala() {
   $('salaTit').textContent = tipoLabel(S.info.tipo) + ' nº ' + S.info.numero + ', ' + S.info.titulo;
   $('cTela').innerHTML = I.tela; $('cReg').innerHTML = I.reg; $('cLink').innerHTML = I.link; $('cSair').innerHTML = I.sair;
+  $('cMao').innerHTML = I.mao; $('cChat').innerHTML = I.chat + '<span class="ponto oculto" id="pontoChat"></span>';
   $('fecharReg').innerHTML = I.x;
   if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia || !S.temCam) $('cTela').classList.add('oculto');
   if (!SR) $('avisoSR').classList.remove('oculto');
+  if (!S.host) $('cMao').classList.remove('oculto');
   if (window.matchMedia('(max-width:900px)').matches) $('cReg').classList.remove('ativo');
+  $('cMao').onclick = alternarMao;
+  $('cChat').onclick = () => clicarAba('chat');
+  document.querySelectorAll('.abas button').forEach(b => b.onclick = () => abrirAba(b.dataset.aba));
+  $('fChat').addEventListener('submit', ev => { ev.preventDefault(); enviarChat(); });
+  $('chatTxt').addEventListener('keydown', ev => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); enviarChat(); } });
 
   $('cMic').onclick = () => { alternarMic(); atualizarControles(); };
   $('cCam').onclick = () => { alternarCam(); atualizarControles(); };
   $('cTela').onclick = alternarTela;
-  $('cReg').onclick = alternarRegistro;
-  $('fecharReg').onclick = alternarRegistro;
+  $('cReg').onclick = () => clicarAba(S.aba === 'chat' ? 'registro' : S.aba);
+  $('fecharReg').onclick = () => mostrarPainel(false);
   $('cLink').onclick = () => copiar(linkParticipantes());
   $('cSair').onclick = pedirSaida;
 
   const el = document.createElement('div');
   el.className = 'tile eu';
   el.innerHTML = `<video autoplay playsinline muted class="espelho"></video><div class="avatar"><b>${esc(iniciais(S.nome))}</b></div>
-    <div class="rot">${I.micOff}<span>${esc(S.nome)}</span><em>você</em></div>`;
+    <div class="rot">${I.micOff}<span>${esc(S.nome)}</span><em>você</em></div><div class="mao-tile">✋ Pediu a palavra</div>`;
   el.querySelector('video').srcObject = S.stream;
   $('grade').appendChild(el);
 
@@ -388,12 +487,18 @@ function atualizarTempo() {
 
 function atualizarControles() {
   botaoMicCam($('cMic'), $('cCam'));
+  const travado = !S.podeFalar && !S.mic;
+  $('cMic').classList.toggle('travado', travado);
+  if (travado) $('cMic').title = 'Microfone bloqueado pelo organizador. Levante a mão para pedir a palavra.';
+  $('cMao').classList.toggle('mao-on', S.mao);
+  $('cMao').title = S.mao ? 'Abaixar a mão' : 'Levantar a mão (pedir a palavra)';
   const eu = document.querySelector('.tile.eu');
   if (eu) {
     eu.classList.toggle('mudo', !S.mic);
     eu.classList.toggle('sem-video', !S.cam && !S.tela);
     eu.classList.toggle('tela', !!S.tela);
     eu.querySelector('video').classList.toggle('espelho', !S.tela);
+    eu.classList.toggle('mao', S.mao);
   }
   $('cTela').classList.toggle('ativo', !!S.tela);
   $('cTela').title = S.tela ? 'Parar de apresentar' : 'Apresentar a tela';
@@ -401,23 +506,184 @@ function atualizarControles() {
 
 function alternarMic() {
   if (!S.temMic) return;
-  S.mic = !S.mic;
+  if (!S.mic && !S.podeFalar) { toast('O organizador controla os microfones. Levante a mão para pedir a palavra.'); return; }
+  definirMic(!S.mic);
+}
+function definirMic(ligar) {
+  if (!S.temMic || S.mic === ligar) return;
+  S.mic = ligar;
   S.stream.getAudioTracks().forEach(t => t.enabled = S.mic);
   if (S.dentro) { if (S.mic) iniciarRec(); else pararRec(); }
+  atualizarControles();
+}
+function alternarMao() {
+  S.mao = !S.mao;
+  atualizarControles();
+  toast(S.mao ? 'Mão levantada. O organizador foi avisado.' : 'Mão abaixada.');
+}
+
+/* ---------- Controle dos microfones ---------- */
+function aplicarControle(c) {
+  if (!c) return;
+  S.ctl = c;
+  if (S.host) { S.podeFalar = true; renderPessoas(); return; }
+  const antes = S.podeFalar;
+  S.podeFalar = c.modo === 'livre' || !!(c.lib && c.lib[S.peer]);
+  const ts = (c.mudo && c.mudo[S.peer]) || 0;
+  if (ts > S.ultMudo && ts > S.entrouEm) {
+    S.ultMudo = ts;
+    if (S.mic) { definirMic(false); toast('O organizador silenciou seu microfone.'); }
+  }
+  if (!S.podeFalar && S.mic) { definirMic(false); toast('O organizador controla os microfones. Use o botão da mão para pedir a palavra.'); }
+  if (S.podeFalar && !antes && c.modo === 'controlado') {
+    S.mao = false;
+    definirMic(true);
+    toast('O organizador liberou sua palavra. Seu microfone está ligado e sua fala vai para o registro.');
+  }
+  atualizarControles();
+  renderPessoas();
+}
+async function controlar(op, alvo, extra) {
+  try {
+    const r = await api(Object.assign({ action: 'controle', sala: SALA, h: CHAVE, peer: S.peer, op, alvo }, extra || {}));
+    S.ctl = r.controle; renderPessoas();
+  } catch (e) { toast(e.message); }
+}
+
+/* ---------- Painel lateral: abas ---------- */
+const mobile = () => window.matchMedia('(max-width:900px)').matches;
+function painelAberto() { return mobile() ? document.body.classList.contains('ver-registro') : !document.body.classList.contains('sem-registro'); }
+function mostrarPainel(v) {
+  if (mobile()) document.body.classList.toggle('ver-registro', v);
+  else document.body.classList.toggle('sem-registro', !v);
+  marcarBotoesPainel();
+  if (v && S.aba === 'chat') zerarNaoLidas();
+}
+function clicarAba(aba) {
+  if (painelAberto() && S.aba === aba) mostrarPainel(false);
+  else { abrirAba(aba); }
+}
+const TIT_ABA = {
+  registro: ['Registro ao vivo', 'Sua fala entra aqui enquanto o microfone estiver ligado.'],
+  chat: ['Chat', 'Perguntas e avisos por escrito. Entram no documento.'],
+  pessoas: ['Pessoas', 'Quem está na sala e quem está sendo registrado.']
+};
+function abrirAba(aba) {
+  S.aba = aba;
+  document.querySelectorAll('.abas button').forEach(b => b.classList.toggle('ativo', b.dataset.aba === aba));
+  $('abaRegistro').classList.toggle('oculto', aba !== 'registro');
+  $('abaChat').classList.toggle('oculto', aba !== 'chat');
+  $('abaPessoas').classList.toggle('oculto', aba !== 'pessoas');
+  $('abaTit').textContent = TIT_ABA[aba][0]; $('abaSub').textContent = TIT_ABA[aba][1];
+  if (!painelAberto()) mostrarPainel(true); else marcarBotoesPainel();
+  if (aba === 'chat') { zerarNaoLidas(); const l = $('chatLista'); l.scrollTop = l.scrollHeight; if (!mobile()) $('chatTxt').focus(); }
+  if (aba === 'pessoas') renderPessoas();
+  if (aba === 'registro') rolarFolha(true);
+}
+function marcarBotoesPainel() {
+  const ab = painelAberto();
+  $('cChat').classList.toggle('ativo', ab && S.aba === 'chat');
+  $('cReg').classList.toggle('ativo', ab && S.aba !== 'chat');
+}
+function zerarNaoLidas() { S.naoLidas = 0; contadores(); }
+function contadores() {
+  const c = $('contChat'), p = $('pontoChat');
+  c.textContent = p.textContent = S.naoLidas > 9 ? '9+' : S.naoLidas;
+  c.classList.toggle('oculto', !S.naoLidas); p.classList.toggle('oculto', !S.naoLidas);
+  const m = $('contMao');
+  m.textContent = S.maos.size; m.classList.toggle('oculto', !S.host || !S.maos.size);
+}
+
+/* ---------- Chat ---------- */
+function enviarChat() {
+  const t = $('chatTxt').value.trim();
+  if (!t) return;
+  $('chatTxt').value = '';
+  S.chatPend.push(t);
+  const el = document.createElement('div');
+  el.className = 'msg minha pend';
+  el.innerHTML = `<span class="quem">${esc(S.nome)}</span><span class="h">enviando…</span><p>${esc(t)}</p>`;
+  el.dataset.txt = t;
+  $('chatLista').appendChild(el);
+  $('chatVazio').classList.add('oculto');
+  $('chatLista').scrollTop = $('chatLista').scrollHeight;
+}
+function pegarChat() {
+  const out = [];
+  let total = 0;
+  while (S.chatPend.length && total < 600) { const m = S.chatPend.shift(); out.push(m); total += m.length; }
+  return out;
+}
+function adicionarChat(lista) {
+  const box = $('chatLista');
+  const perto = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  let novasDeOutros = 0;
+  (lista || []).forEach(m => {
+    if (m.seq <= S.ultimoChat) return;
+    S.ultimoChat = m.seq;
+    const minha = m.peer === S.peer;
+    if (minha) { const p = [...box.querySelectorAll('.msg.pend')].find(x => x.dataset.txt === m.texto); if (p) p.remove(); }
+    else novasDeOutros++;
+    const el = document.createElement('div');
+    el.className = 'msg' + (minha ? ' minha' : '');
+    el.innerHTML = `<span class="quem">${esc(m.nome)}</span><span class="h">${esc(m.hora)}</span><p>${esc(m.texto)}</p>`;
+    const pend = box.querySelector('.msg.pend');
+    box.insertBefore(el, pend);
+  });
+  if ((lista || []).length) $('chatVazio').classList.add('oculto');
+  if (perto || (lista || []).some(m => m.peer === S.peer)) box.scrollTop = box.scrollHeight;
+  if (novasDeOutros && !(painelAberto() && S.aba === 'chat')) { S.naoLidas += novasDeOutros; contadores(); }
+}
+
+/* ---------- Pessoas ---------- */
+function renderPessoas() {
+  const box = $('pessoas');
+  if (!box) return;
+  const c = S.ctl, ctrl = c.modo === 'controlado';
+  let html = '';
+  if (S.host) {
+    html += `<div class="modo"><p>${ctrl
+      ? 'Só fala quem você liberar. Quem receber a palavra tem o microfone ligado e a fala registrada.'
+      : 'Todos podem ligar o microfone. Quem fala no Chrome ou Edge entra no registro.'}</p>
+      <div class="seg"><button data-m="livre" class="${ctrl ? '' : 'ativo'}">Microfones livres</button><button data-m="controlado" class="${ctrl ? 'ativo' : ''}">Controlados por mim</button></div>
+      <button class="btn-p blo cheio" data-op="silenciarTodos">Silenciar todos</button></div>`;
+  }
+  const lista = S.presenca.length ? S.presenca : [{ id: S.peer, nome: S.nome, host: S.host, estado: { mic: S.mic, sr: !!SR } }];
+  const ord = [...lista].sort((a, b) => (b.host - a.host) || ((b.estado || {}).mao ? 1 : 0) - ((a.estado || {}).mao ? 1 : 0));
+  html += ord.map(p => {
+    const e = p.estado || {}, eu = p.id === S.peer;
+    const liberado = p.host || !ctrl || !!c.lib[p.id];
+    const selos = [];
+    if (p.host) selos.push('<span class="selo">organização</span>');
+    if (e.mao) selos.push('<span class="selo mao">✋ pediu a palavra</span>');
+    if (ctrl && !p.host) selos.push(liberado ? '<span class="selo ok">com a palavra</span>' : '<span class="selo">aguardando</span>');
+    selos.push(e.mic ? '<span class="selo ok">microfone ligado</span>' : '<span class="selo">microfone desligado</span>');
+    if (e.sr === false) selos.push('<span class="selo alerta">fala não registrada (navegador)</span>');
+    else if (e.mic && e.sr) selos.push('<span class="selo ok">registrando</span>');
+    let botoes = '';
+    if (S.host && !eu && !p.host) {
+      if (ctrl) botoes = liberado
+        ? `<button class="btn-p blo" data-op="bloquear" data-alvo="${esc(p.id)}">Encerrar palavra</button>`
+        : `<button class="btn-p lib" data-op="liberar" data-alvo="${esc(p.id)}">Liberar palavra</button>`;
+      else if (e.mic) botoes = `<button class="btn-p blo" data-op="silenciar" data-alvo="${esc(p.id)}">Silenciar</button>`;
+    }
+    return `<div class="pessoa"><span class="ini">${esc(iniciais(p.nome))}</span>
+      <span class="info"><b>${esc(p.nome)}${eu ? ' (você)' : ''}</b><span class="selos">${selos.join('')}</span></span>${botoes}</div>`;
+  }).join('');
+  box.innerHTML = html;
+  box.querySelectorAll('[data-m]').forEach(b => b.onclick = () => controlar('modo', '', { modo: b.dataset.m }));
+  box.querySelectorAll('[data-op]').forEach(b => b.onclick = () => controlar(b.dataset.op, b.dataset.alvo || ''));
+}
+function verificarMaos() {
+  const agora = new Set(S.presenca.filter(p => p.id !== S.peer && (p.estado || {}).mao).map(p => p.id));
+  if (S.host) agora.forEach(id => { if (!S.maos.has(id)) { const p = S.presenca.find(x => x.id === id); toast('✋ ' + (p ? p.nome : 'Alguém') + ' pediu a palavra.'); } });
+  S.maos = agora;
+  contadores();
 }
 function alternarCam() {
   if (!S.temCam) return;
   S.cam = !S.cam;
   S.stream.getVideoTracks().forEach(t => t.enabled = S.cam);
-}
-function alternarRegistro() {
-  if (window.matchMedia('(max-width:900px)').matches) {
-    document.body.classList.toggle('ver-registro');
-    $('cReg').classList.toggle('ativo', document.body.classList.contains('ver-registro'));
-  } else {
-    document.body.classList.toggle('sem-registro');
-    $('cReg').classList.toggle('ativo', !document.body.classList.contains('sem-registro'));
-  }
 }
 
 /* ---------- Apresentar tela ---------- */
@@ -453,8 +719,8 @@ async function ciclo() {
   if (!S.dentro || S.fim) return;
   const corpo = {
     action: 'sync', sala: SALA, peer: S.peer, nome: S.nome, cargo: S.cargo,
-    estado: { mic: S.mic, cam: S.cam || !!S.tela, tela: !!S.tela },
-    sinais: S.saida.splice(0), falas: S.falasPend.splice(0), ultimaSeq: S.ultimaSeq
+    estado: { mic: S.mic, cam: S.cam || !!S.tela, tela: !!S.tela, sr: !!SR && !S.recBloqueado, mao: S.mao },
+    sinais: [], falas: pegarFalas(), ultimaSeq: S.ultimaSeq, chat: pegarChat(), ultimoChat: S.ultimoChat
   };
   try {
     const r = await api(corpo);
@@ -463,11 +729,15 @@ async function ciclo() {
     for (const sg of r.sinais) { try { await receberSinal(sg.from, sg.data); } catch (e) { console.warn('sinal', e); } }
     reconciliar();
     adicionarFalas(r.falas);
+    adicionarChat(r.chat);
+    aplicarControle(r.controle);
+    verificarMaos();
+    if (S.aba === 'pessoas') renderPessoas();
     atualizarTempo();
     if (ENCERRADOS.includes(r.status)) { finalizar('O organizador encerrou a reunião', 'O documento será redigido e enviado para assinatura.'); return; }
   } catch (e) {
-    S.saida.unshift(...corpo.sinais);
     S.falasPend.unshift(...corpo.falas);
+    S.chatPend.unshift(...corpo.chat);
     if (++S.falhas >= 3) avisoRede('Conexão instável com o servidor da Sala. Tentando de novo…');
   }
   setTimeout(ciclo, 1000);
@@ -510,7 +780,7 @@ async function ligarPara(id) {
   try {
     await c.pc.setLocalDescription(await c.pc.createOffer());
     await iceCompleto(c.pc);
-    if (S.conns.get(id) === c) S.saida.push({ to: id, data: { tipo: 'oferta', sdp: c.pc.localDescription.sdp } });
+    if (S.conns.get(id) === c) enviarSinal(id, { tipo: 'oferta', sdp: c.pc.localDescription.sdp });
   } catch (e) { console.warn('oferta', e); }
 }
 async function receberSinal(de, data) {
@@ -522,7 +792,7 @@ async function receberSinal(de, data) {
     await c.pc.setRemoteDescription({ type: 'offer', sdp: data.sdp });
     await c.pc.setLocalDescription(await c.pc.createAnswer());
     await iceCompleto(c.pc);
-    if (S.conns.get(de) === c) S.saida.push({ to: de, data: { tipo: 'resposta', sdp: c.pc.localDescription.sdp } });
+    if (S.conns.get(de) === c) enviarSinal(de, { tipo: 'resposta', sdp: c.pc.localDescription.sdp });
   } else if (data.tipo === 'resposta') {
     const c = S.conns.get(de);
     if (c && c.pc.signalingState === 'have-local-offer') await c.pc.setRemoteDescription({ type: 'answer', sdp: data.sdp });
@@ -561,7 +831,7 @@ function garantirTile(p) {
   el.className = 'tile aguardando';
   el.dataset.id = p.id;
   el.innerHTML = `<video autoplay playsinline></video><div class="avatar"><b></b></div>
-    <div class="rot">${I.micOff}<span></span><em></em></div><div class="conectando">Conectando…</div>`;
+    <div class="rot">${I.micOff}<span></span><em></em></div><div class="conectando">Conectando…</div><div class="mao-tile">✋ Pediu a palavra</div>`;
   $('grade').appendChild(el);
   const c = S.conns.get(p.id);
   if (c && c.remoto) el.querySelector('video').srcObject = c.remoto;
@@ -575,6 +845,7 @@ function atualizarTile(el, p) {
   el.classList.toggle('mudo', e.mic === false);
   el.classList.toggle('sem-video', e.cam === false);
   el.classList.toggle('tela', !!e.tela);
+  el.classList.toggle('mao', !!e.mao);
 }
 function layoutGrade() {
   const g = $('grade');
@@ -660,15 +931,13 @@ function pedirSaida() {
 }
 function avisarSaida() {
   if (!S.peer) return;
-  try {
-    navigator.sendBeacon(API_URL, new Blob([JSON.stringify({ action: 'sair', sala: SALA, peer: S.peer })], { type: 'text/plain' }));
-  } catch (e) {}
+  try { api({ action: 'sair', sala: SALA, peer: S.peer }, { keepalive: true }).catch(() => {}); } catch (e) {}
 }
 async function finalizar(tit, msg) {
   if (S.fim) return;
   // envia as últimas falas antes de sair
-  if (S.falasPend.length && S.dentro) {
-    try { await api({ action: 'sync', sala: SALA, peer: S.peer, nome: S.nome, sinais: [], falas: S.falasPend.splice(0), ultimaSeq: S.ultimaSeq, estado: {} }); } catch (e) {}
+  if ((S.falasPend.length || S.chatPend.length) && S.dentro) {
+    while (S.falasPend.length || S.chatPend.length) { try { await api({ action: 'sync', sala: SALA, peer: S.peer, nome: S.nome, sinais: [], falas: pegarFalas(), chat: pegarChat(), ultimaSeq: S.ultimaSeq, ultimoChat: S.ultimoChat, estado: {} }); } catch (e) { break; } }
   }
   S.fim = true; S.dentro = false;
   pararRec(); avisarSaida();
