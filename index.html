@@ -145,6 +145,63 @@ body.sem-registro .registro{display:none}
 .ctl .ponto{position:absolute;top:4px;right:4px;min-width:16px;height:16px;border-radius:8px;background:var(--lacre);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
 .ctl.travado{background:#4A3A3A;color:#C9A9A6}
 .ctl.mao-on{background:#F2C46D;color:#3A2A05}
+.ctl.assinar{width:auto;border-radius:24px;padding:0 18px;gap:8px;display:flex;align-items:center;font-weight:600;font-size:14px}
+.ctl.assinar:disabled{opacity:1;background:var(--palco-3);color:#7D8596;cursor:not-allowed}
+.ctl.assinar.pronto{background:#2F9E6E;color:#fff;animation:chamar 2s ease-in-out infinite}
+.ctl.assinar.feito{background:#24493B;color:#9FE0C0}
+@keyframes chamar{0%,100%{box-shadow:0 0 0 0 rgba(62,156,114,.6)}50%{box-shadow:0 0 0 8px rgba(62,156,114,0)}}
+@media (prefers-reduced-motion:reduce){.ctl.assinar.pronto{animation:none}}
+@media (max-width:900px){.ctl.assinar span{display:none}.ctl.assinar{padding:0 12px}}
+/* Autorização */
+.consent{display:flex;gap:10px;align-items:flex-start;background:#20262F;border:1px solid var(--borda);border-radius:10px;padding:12px 14px;margin:4px 0 14px;cursor:pointer;font-size:13.5px;color:#C9CFDB;line-height:1.45}
+.consent input{width:18px;height:18px;margin-top:2px;flex:none;accent-color:var(--tinta-viva)}
+.consent b{color:var(--claro)}
+.consent.ok{border-color:#3E9C72;background:#1E2B27}
+.previa .pedir{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--apagado);font-size:14px}
+.previa .pedir svg{width:34px;height:34px;display:block;margin:0 auto 10px;color:#6F7889}
+/* Espera e fim */
+.giro{width:38px;height:38px;border-radius:50%;border:3px solid #2E3441;border-top-color:var(--tinta-viva);margin:22px auto 6px;animation:gir .9s linear infinite}
+@keyframes gir{to{transform:rotate(360deg)}}
+.est-acoes{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:22px}
+.est-acoes .btn{min-width:260px}
+.est-acoes .btn.sec{background:var(--palco-3);color:var(--claro)}
+.cta{margin-top:34px;padding-top:24px;border-top:1px solid var(--borda)}
+.cta h2{font-family:var(--serif);font-weight:600;font-size:22px;margin:0 0 6px;color:var(--claro)}
+.cta p{margin:0 0 4px}
+.est-acoes a.btn{text-decoration:none}
+.fixar-btn svg{width:13px;height:13px;vertical-align:-2px;margin-right:4px}
+.btn.prov{background:#fff;color:#22262E;gap:10px}
+.btn.prov:hover{background:#EEF2F8}
+.btn.prov svg{width:18px;height:18px}
+/* Gravação, espera do organizador e destaque */
+.rec-pill{display:inline-flex;align-items:center;gap:6px;background:#3A1F22;color:#FF9A92;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.rec-pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#FF5A4E;animation:pisca 1.4s ease-in-out infinite}
+@keyframes pisca{50%{opacity:.25}}
+.ctl.gravando{background:var(--lacre);color:#fff}
+.aviso-espera{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:45;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  background:#F2C46D;color:#2E2205;font-weight:600;font-size:14px;padding:10px 14px;border-radius:12px;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);max-width:calc(100vw - 24px)}
+.aviso-espera button{border:0;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;background:#2E2205;color:#F2C46D}
+.aviso-espera button.sec{background:transparent;color:#2E2205;text-decoration:underline}
+.espera-box{background:#FFF7E6;border:1px solid #F2D8A0;border-radius:10px;padding:10px 12px;margin:10px 0}
+.espera-box h3{margin:0 0 6px;font-size:13.5px;color:#7A5205}
+.fixar-btn{position:absolute;top:8px;right:8px;z-index:3;border:0;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;cursor:pointer;
+  background:rgba(17,20,26,.72);color:#fff;opacity:0;transition:opacity .15s}
+.tile:hover .fixar-btn,.tile.fixo .fixar-btn,.fixar-btn:focus-visible{opacity:1}
+.tile.fixo{outline:2px solid var(--tinta-viva);outline-offset:-2px}
+.grade.destaque{overflow-y:auto}
+@media (prefers-reduced-motion:reduce){.giro,.rec-pill::before{animation:none}}
+.campo-cod input{font-family:'Courier New',monospace;font-size:18px;letter-spacing:.2em;text-transform:uppercase}
+.campo-cod input::placeholder{font-family:var(--sans);font-size:14px;letter-spacing:0;text-transform:none}
+.doc-passos{padding:14px 18px;overflow-y:auto;flex:1}
+.doc-passo{border:1px solid #E3E7EF;border-radius:10px;padding:14px;margin-bottom:12px}
+.doc-passo h3{margin:0 0 4px;font-size:14.5px;display:flex;align-items:center;gap:8px}
+.doc-passo h3 i{font-style:normal;width:20px;height:20px;border-radius:50%;background:#E8EDFB;color:var(--tinta);display:grid;place-items:center;font-size:11px;font-weight:700}
+.doc-passo.feito h3 i{background:#2F7D5B;color:#fff}
+.doc-passo p{margin:0 0 10px;font-size:13px;color:var(--suave)}
+.doc-passo .linha{display:flex;gap:8px;flex-wrap:wrap}
+.doc-passo a{color:var(--tinta);font-weight:600;font-size:13px}
+.prog{height:8px;background:#EEF1F6;border-radius:4px;overflow:hidden;margin:6px 0 4px}
+.prog i{display:block;height:100%;background:#2F7D5B;border-radius:4px}
 .folha{
   --l:30px;flex:1;overflow-y:auto;
   background-image:
@@ -188,13 +245,14 @@ body.sem-registro .registro{display:none}
 <body>
 
 <!-- Carregando / erro / fim -->
-<div id="telaEstado" class="estado"><div><p class="marca"><img src="logo-sala.png" alt="Sala" style="width:min(320px,80vw);height:auto;filter:brightness(0) invert(1)"></p><h1 id="estTit">Abrindo a sala…</h1><p id="estMsg"></p></div></div>
+<div id="telaEstado" class="estado"><div><p class="marca"><img src="logo-sala.png" alt="Sala" style="width:min(320px,80vw);height:auto;filter:brightness(0) invert(1)"></p><h1 id="estTit">Abrindo a sala…</h1><p id="estMsg"></p><div id="estExtra"></div></div></div>
 
 <!-- Antes de entrar -->
 <div id="telaPre" class="pre oculto">
   <div>
     <div class="previa">
       <video id="previa" autoplay playsinline muted></video>
+      <div class="pedir" id="pedirMidia"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/></svg>Câmera e microfone ficam desligados até você autorizar ao lado.</div></div>
       <div class="sem-cam oculto" id="semCamPre">Câmera desligada</div>
       <div class="botoes">
         <button class="ctl" id="pMic" title="Ligar ou desligar microfone"></button>
@@ -211,10 +269,14 @@ body.sem-registro .registro{display:none}
     <form id="fEntrar">
       <label class="campo"><span>Seu nome completo</span><input id="iNome" maxlength="80" autocomplete="name" required></label>
       <div class="dupla">
-        <label class="campo"><span>E-mail</span><input id="iEmail" type="email" maxlength="120" autocomplete="email"></label>
+        <label class="campo"><span id="rotEmail">E-mail</span><input id="iEmail" type="email" maxlength="120" autocomplete="email"></label>
         <label class="campo"><span>Cargo ou função</span><input id="iCargo" maxlength="80"></label>
       </div>
-      <button class="btn cheio" id="bEntrar" type="submit">Entrar na reunião</button>
+      <label class="campo"><span>Celular com WhatsApp (opcional)</span><input id="iTel" type="tel" maxlength="20" autocomplete="tel" placeholder="(00) 00000-0000"></label>
+      <label class="campo campo-cod oculto" id="campoCodigo"><span>Código de acesso</span><input id="iCodigo" maxlength="12" autocomplete="off" placeholder="Enviado pelo organizador"></label>
+      <label class="consent" id="caixaConsent"><input type="checkbox" id="iConsent">
+        <span>Autorizo a Sala a captar minha <b>voz</b> e minha <b>imagem</b> durante esta reunião, para transmitir aos participantes, <b>gravar o áudio</b> e redigir a ata. Posso desligar câmera e microfone a qualquer momento.</span></label>
+      <button class="btn cheio" id="bEntrar" type="submit" disabled>Entrar na reunião</button>
       <p class="erro-msg" id="erroEntrar"></p>
       <p class="nota" id="notaSR"></p>
     </form>
@@ -224,8 +286,9 @@ body.sem-registro .registro{display:none}
 <!-- Reunião -->
 <div id="telaSala" class="sala oculto">
   <div class="topo">
-    <span class="marca"><img src="icone-sala.png" alt="" style="height:26px;vertical-align:-6px;margin-right:6px">Sala</span>
+    <span class="marca"><img src="logo-mini.png" alt="" style="height:26px;vertical-align:-6px;margin-right:6px">Sala</span>
     <span class="tit" id="salaTit"></span>
+    <span class="rec-pill oculto" id="recPill" title="O áudio desta reunião está sendo gravado para a ata">Gravando</span>
     <span class="tempo" id="tempo"></span>
   </div>
   <div class="palco"><div class="grade" id="grade"></div></div>
@@ -233,10 +296,12 @@ body.sem-registro .registro{display:none}
     <button class="ctl" id="cMic" title="Microfone"></button>
     <button class="ctl" id="cCam" title="Câmera"></button>
     <button class="ctl" id="cTela" title="Apresentar a tela"></button>
+    <button class="ctl oculto" id="cGrav" title="Gravar o áudio da reunião"></button>
     <button class="ctl oculto" id="cMao" title="Levantar a mão"></button>
     <button class="ctl" id="cChat" title="Chat"></button>
     <button class="ctl ativo" id="cReg" title="Registro e participantes"></button>
-    <button class="ctl" id="cLink" title="Copiar link da reunião"></button>
+    <button class="ctl assinar" id="cAss" disabled title="O organizador ainda não liberou a assinatura"></button>
+    <button class="ctl oculto" id="cLink" title="Copiar convite (link + código)"></button>
     <button class="ctl sair" id="cSair" title="Sair da reunião"></button>
   </div>
   <section class="registro" aria-label="Registro ao vivo">
@@ -246,6 +311,7 @@ body.sem-registro .registro{display:none}
           <button data-aba="registro" class="ativo">Registro</button>
           <button data-aba="chat">Chat <span class="cont oculto" id="contChat"></span></button>
           <button data-aba="pessoas">Pessoas <span class="cont oculto" id="contMao"></span></button>
+          <button data-aba="documento" class="oculto">Documento</button>
         </nav>
       </div>
       <button class="fechar" id="fecharReg" title="Fechar painel"></button>
@@ -259,10 +325,12 @@ body.sem-registro .registro{display:none}
       <form class="chat-form" id="fChat"><textarea id="chatTxt" maxlength="500" placeholder="Escreva uma mensagem" aria-label="Mensagem"></textarea><button type="submit">Enviar</button></form>
     </div>
     <div class="painel-aba oculto" id="abaPessoas"><div class="pessoas" id="pessoas"></div></div>
+    <div class="painel-aba oculto" id="abaDocumento"><div class="doc-passos" id="docPassos"></div></div>
   </section>
 </div>
 
 <div id="avisoRede" class="aviso-rede oculto"></div>
+<div id="avisoEspera" class="aviso-espera oculto" role="status"></div>
 <div id="modal"></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
@@ -286,7 +354,8 @@ const S = {
   ultimoChat: 0, chatPend: [], chatEnviando: [], naoLidas: 0, aba: 'registro',
   ctl: { modo: 'livre', lib: {}, mudo: {} }, podeFalar: true, mao: false, ultMudo: 0, maos: new Set(),
   dentro: false, fim: false, falhas: 0, entrouEm: 0,
-  rec: null, recAtivo: false, recBloqueado: false
+  rec: null, recAtivo: false, recBloqueado: false,
+  espera: [], esperaVistos: new Set(), aguardando: false, midiaAberta: false
 };
 const $ = id => document.getElementById(id);
 
@@ -296,11 +365,14 @@ const I = {
   cam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/></svg>',
   camOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/><path d="M3 3l18 18"/></svg>',
   tela: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8"/><path d="M12 16v4"/></svg>',
+  assinar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/><path d="M14 21h7"/></svg>',
   reg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7"/><path d="M9 15h7"/><path d="M9 7h3"/></svg>',
   link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>',
   sair: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 14.5c4.7-4.2 12.3-4.2 17 0l-1.8 2.6-3.9-1.1v-2.6a9.5 9.5 0 0 0-5.6 0V16l-3.9 1.1z"/></svg>',
   mao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12"/><path d="M11 11.5v-8a1.5 1.5 0 0 1 3 0V12"/><path d="M14 11.5V6a1.5 1.5 0 0 1 3 0v8.5a6.5 6.5 0 0 1-6.5 6.5h-.6a6 6 0 0 1-4.6-2.2L3.6 16a1.5 1.5 0 0 1 2.3-1.9L8 16.2"/></svg>',
   chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>',
+  pino: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/></svg>',
+  grav: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>',
   x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
 };
 
@@ -345,7 +417,11 @@ function pegarFalas() {
   return out;
 }
 function mostrar(qual) { ['telaEstado', 'telaPre', 'telaSala'].forEach(id => $(id).classList.toggle('oculto', id !== qual)); }
-function telaEstado(tit, msg) { $('estTit').textContent = tit; $('estMsg').textContent = msg || ''; mostrar('telaEstado'); }
+function telaEstado(tit, msg, extra) {
+  $('estTit').textContent = tit; $('estMsg').textContent = msg || '';
+  $('estExtra').innerHTML = extra || '';
+  mostrar('telaEstado');
+}
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2600); }
 function avisoRede(msg) { const a = $('avisoRede'); a.textContent = msg; a.classList.toggle('oculto', !msg); }
 function linkParticipantes() { return location.origin + location.pathname + '?s=' + encodeURIComponent(SALA); }
@@ -362,7 +438,6 @@ async function copiar(t) {
   catch (e) { return telaEstado('Não foi possível abrir a sala', e.message); }
   if (ENCERRADOS.includes(S.info.status)) return telaEstado('Esta reunião já foi encerrada', 'O documento está com o organizador.');
   montarPre();
-  await abrirMidia();
 })();
 
 function montarPre() {
@@ -374,13 +449,25 @@ function montarPre() {
   $('prePauta').innerHTML = (i.pauta || '').split('\n').filter(x => x.trim()).map(x => `<li>${esc(x)}</li>`).join('');
   try {
     const p = JSON.parse(localStorage.getItem('sala_eu') || '{}');
-    $('iNome').value = p.nome || ''; $('iEmail').value = p.email || ''; $('iCargo').value = p.cargo || '';
+    $('iNome').value = p.nome || ''; $('iEmail').value = p.email || ''; $('iCargo').value = p.cargo || ''; $('iTel').value = p.tel || '';
   } catch (e) {}
   if (!SR) { $('notaSR').textContent = 'Seu navegador não transcreve fala. Use Chrome ou Edge no computador para que suas falas entrem no documento.'; $('notaSR').classList.add('alerta'); }
   else $('notaSR').textContent = 'Use fone de ouvido: assim a transcrição registra só a sua voz.';
+  $('iConsent').onchange = async () => {
+    const ok = $('iConsent').checked;
+    $('caixaConsent').classList.toggle('ok', ok);
+    $('bEntrar').disabled = !ok;
+    if (ok && !S.midiaAberta) await abrirMidia();
+    if (!ok && S.midiaAberta) fecharMidia();
+  };
+  atualizarBotoesPre();
   $('pMic').onclick = () => { alternarMic(); atualizarBotoesPre(); };
   $('pCam').onclick = () => { alternarCam(); atualizarBotoesPre(); };
   $('fEntrar').addEventListener('submit', entrar);
+  if (i.exigeEmail) { $('rotEmail').textContent = 'E-mail (sua chave para assinar)'; $('iEmail').required = true; }
+  if (i.precisaCodigo) {
+    $('campoCodigo').classList.remove('oculto');
+  }
   mostrar('telaPre');
 }
 
@@ -400,13 +487,24 @@ async function abrirMidia() {
   S.temMic = S.stream.getAudioTracks().length > 0;
   S.temCam = S.stream.getVideoTracks().length > 0;
   S.mic = S.temMic; S.cam = S.temCam;
+  S.midiaAberta = true;
+  $('pedirMidia').classList.add('oculto');
   $('previa').srcObject = S.stream;
+  atualizarBotoesPre();
+}
+function fecharMidia() {
+  S.stream.getTracks().forEach(t => t.stop());
+  S.stream = new MediaStream();
+  S.temMic = S.temCam = S.mic = S.cam = false; S.midiaAberta = false;
+  $('previa').srcObject = null;
+  $('pedirMidia').classList.remove('oculto');
+  $('notaMidia').textContent = '';
   atualizarBotoesPre();
 }
 
 function atualizarBotoesPre() {
   botaoMicCam($('pMic'), $('pCam'));
-  $('semCamPre').classList.toggle('oculto', S.cam);
+  $('semCamPre').classList.toggle('oculto', S.cam || !S.midiaAberta);
   $('previa').style.visibility = S.cam ? 'visible' : 'hidden';
 }
 function botaoMicCam(bMic, bCam) {
@@ -426,25 +524,71 @@ async function entrar(ev) {
   $('erroEntrar').textContent = '';
   S.nome = $('iNome').value.trim(); S.email = $('iEmail').value.trim(); S.cargo = $('iCargo').value.trim();
   if (S.nome.length < 3) { $('erroEntrar').textContent = 'Digite seu nome completo. Ele vai aparecer no documento.'; return; }
-  try { localStorage.setItem('sala_eu', JSON.stringify({ nome: S.nome, email: S.email, cargo: S.cargo })); } catch (e) {}
+  if (S.info.exigeEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(S.email)) { $('erroEntrar').textContent = 'Digite seu e-mail: ele é a sua chave para assinar o documento no final.'; $('iEmail').focus(); return; }
+  if (!$('iConsent').checked) { $('erroEntrar').textContent = 'Para entrar, marque a autorização de voz e imagem.'; return; }
+  if (S.info.precisaCodigo && !$('iCodigo').value.trim()) { $('erroEntrar').textContent = 'Digite o código de acesso que o organizador enviou.'; $('iCodigo').focus(); return; }
+  S.tel = $('iTel').value.trim();
+  try { localStorage.setItem('sala_eu', JSON.stringify({ nome: S.nome, email: S.email, cargo: S.cargo, tel: S.tel })); } catch (e) {}
   const b = $('bEntrar'); b.disabled = true; b.textContent = 'Entrando…';
   try {
-    const r = await api({ action: 'entrar', sala: SALA, h: CHAVE, nome: S.nome, email: S.email, cargo: S.cargo });
+    const r = await api({ action: 'entrar', sala: SALA, h: CHAVE, nome: S.nome, email: S.email, cargo: S.cargo,
+      codigo: $('iCodigo').value, telefone: S.tel, consentiu: true });
     S.peer = r.peer; S.host = r.host;
+    if (r.pauta) S.info.pauta = r.pauta;
+    if (r.aguardando) { aguardar(); return; }
   } catch (e) {
     $('erroEntrar').textContent = e.message;
     b.disabled = false; b.textContent = 'Entrar na reunião';
     return;
   }
+  entrarNaSala();
+}
+function entrarNaSala() {
   S.dentro = true; S.entrouEm = Date.now();
   montarSala();
   iniciarRec();
   ciclo();
+  if (S.host) iniciarGravacao(true);
+}
+const pausa = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- Sala de espera (participante) ---------- */
+async function aguardar() {
+  S.aguardando = true;
+  telaEstado('Aguardando o organizador', 'Sua entrada foi pedida. O organizador vai liberar em instantes.',
+    `<div class="giro" aria-hidden="true"></div><div class="est-acoes"><button class="btn sec" id="bDesistir">Sair</button></div>`);
+  $('bDesistir').onclick = () => { S.aguardando = false; avisarSaida(); fimParticipante('Você saiu', 'Sua entrada na reunião foi cancelada.'); };
+  while (S.aguardando && !S.fim) {
+    try {
+      const r = await api({ action: 'sync', sala: SALA, peer: S.peer, nome: S.nome });
+      if (!S.aguardando) return;
+      if (r.recusado) { S.aguardando = false; return fimParticipante('Entrada não autorizada', 'O organizador não liberou sua entrada nesta reunião.'); }
+      if (ENCERRADOS.includes(r.status)) { S.aguardando = false; return fimParticipante('Esta reunião foi encerrada', 'O documento está com o organizador.'); }
+      if (!r.aguardando) { S.aguardando = false; toast('O organizador liberou sua entrada.'); entrarNaSala(); return; }
+      $('estMsg').textContent = r.organizadorPresente
+        ? 'O organizador já foi avisado e vai liberar sua entrada em instantes.'
+        : 'O organizador ainda não entrou. Assim que ele chegar, poderá liberar sua entrada.';
+    } catch (e) {
+      if (/não foi encontrada/.test(e.message)) { S.aguardando = false; return fimParticipante('Sua entrada expirou', 'Abra de novo o link da reunião.'); }
+    }
+    await pausa(2000);
+  }
+}
+function fimParticipante(tit, msg) {
+  S.fim = true;
+  try { S.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+  telaEstado(tit, msg, S.host ? '' : '<div id="ctaSala"></div>');
+  if (!S.host) montarCta();
 }
 
 /* ================= Sala ================= */
 function montarSala() {
   $('salaTit').textContent = tipoLabel(S.info.tipo) + ' nº ' + S.info.numero + ', ' + S.info.titulo;
+  $('cGrav').innerHTML = I.grav;
+  if (S.host && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext)) {
+    $('cGrav').classList.remove('oculto');
+    $('cGrav').onclick = () => { if (G.ligado) pararGravacao(); else iniciarGravacao(false); };
+  }
   $('cTela').innerHTML = I.tela; $('cReg').innerHTML = I.reg; $('cLink').innerHTML = I.link; $('cSair').innerHTML = I.sair;
   $('cMao').innerHTML = I.mao; $('cChat').innerHTML = I.chat + '<span class="ponto oculto" id="pontoChat"></span>';
   $('fecharReg').innerHTML = I.x;
@@ -463,13 +607,18 @@ function montarSala() {
   $('cTela').onclick = alternarTela;
   $('cReg').onclick = () => clicarAba(S.aba === 'chat' ? 'registro' : S.aba);
   $('fecharReg').onclick = () => mostrarPainel(false);
-  $('cLink').onclick = () => copiar(linkParticipantes());
+  $('cLink').onclick = () => copiar(`Convite: ${S.info.titulo}\nLink: ${linkParticipantes()}` + (S.info.codigo ? `\nCódigo de acesso: ${S.info.codigo}` : ''));
+  if (S.host) $('cLink').classList.remove('oculto');
+  $('cAss').innerHTML = I.assinar + '<span>Assinar</span>';
+  $('cAss').onclick = abrirAssinatura;
+  if (S.host) document.querySelector('[data-aba="documento"]').classList.remove('oculto');
   $('cSair').onclick = pedirSaida;
 
   const el = document.createElement('div');
   el.className = 'tile eu';
   el.innerHTML = `<video autoplay playsinline muted class="espelho"></video><div class="avatar"><b>${esc(iniciais(S.nome))}</b></div>
-    <div class="rot">${I.micOff}<span>${esc(S.nome)}</span><em>você</em></div><div class="mao-tile">✋ Pediu a palavra</div>`;
+    <div class="rot">${I.micOff}<span>${esc(S.nome)}</span><em>você</em></div><div class="mao-tile">✋ Pediu a palavra</div>${botaoFixar(S.peer)}`;
+  el.dataset.peer = S.peer;
   el.querySelector('video').srcObject = S.stream;
   $('grade').appendChild(el);
 
@@ -566,7 +715,8 @@ function clicarAba(aba) {
 const TIT_ABA = {
   registro: ['Registro ao vivo', 'Sua fala entra aqui enquanto o microfone estiver ligado.'],
   chat: ['Chat', 'Perguntas e avisos por escrito. Entram no documento.'],
-  pessoas: ['Pessoas', 'Quem está na sala e quem está sendo registrado.']
+  pessoas: ['Pessoas', 'Quem está na sala e quem está sendo registrado.'],
+  documento: ['Documento', 'Redija e libere a assinatura antes mesmo de encerrar.']
 };
 function abrirAba(aba) {
   S.aba = aba;
@@ -574,10 +724,12 @@ function abrirAba(aba) {
   $('abaRegistro').classList.toggle('oculto', aba !== 'registro');
   $('abaChat').classList.toggle('oculto', aba !== 'chat');
   $('abaPessoas').classList.toggle('oculto', aba !== 'pessoas');
+  $('abaDocumento').classList.toggle('oculto', aba !== 'documento');
   $('abaTit').textContent = TIT_ABA[aba][0]; $('abaSub').textContent = TIT_ABA[aba][1];
   if (!painelAberto()) mostrarPainel(true); else marcarBotoesPainel();
   if (aba === 'chat') { zerarNaoLidas(); const l = $('chatLista'); l.scrollTop = l.scrollHeight; if (!mobile()) $('chatTxt').focus(); }
   if (aba === 'pessoas') renderPessoas();
+  if (aba === 'documento') renderDocumento();
   if (aba === 'registro') rolarFolha(true);
 }
 function marcarBotoesPainel() {
@@ -591,7 +743,8 @@ function contadores() {
   c.textContent = p.textContent = S.naoLidas > 9 ? '9+' : S.naoLidas;
   c.classList.toggle('oculto', !S.naoLidas); p.classList.toggle('oculto', !S.naoLidas);
   const m = $('contMao');
-  m.textContent = S.maos.size; m.classList.toggle('oculto', !S.host || !S.maos.size);
+  const avisos = S.maos.size + (S.host ? S.espera.length : 0);
+  m.textContent = avisos; m.classList.toggle('oculto', !S.host || !avisos);
 }
 
 /* ---------- Chat ---------- */
@@ -635,12 +788,127 @@ function adicionarChat(lista) {
   if (novasDeOutros && !(painelAberto() && S.aba === 'chat')) { S.naoLidas += novasDeOutros; contadores(); }
 }
 
+/* ---------- Assinatura durante a reunião ---------- */
+function aplicarAssinatura(a) {
+  if (!a) return;
+  const antes = S.assin || {};
+  S.assin = Object.assign({}, a);
+  const b = $('cAss');
+  b.classList.remove('pronto', 'feito');
+  if (a.assinada) {
+    b.disabled = false; b.classList.add('feito');
+    b.innerHTML = I.assinar + '<span>Assinado</span>'; b.title = 'Você já assinou. Clique para ver o documento.';
+  } else if (a.liberada && a.link) {
+    b.disabled = false; b.classList.add('pronto');
+    b.innerHTML = I.assinar + '<span>Assinar documento</span>'; b.title = 'O documento está liberado para sua assinatura';
+    if (!antes.liberada || !antes.link) toast('O documento está liberado. Clique em "Assinar documento".');
+  } else {
+    b.disabled = true;
+    b.innerHTML = I.assinar + '<span>Assinar</span>';
+    b.title = a.liberada ? 'Seu nome não está na lista de assinaturas. Peça ao organizador para liberar de novo.' : 'O organizador ainda não liberou a assinatura';
+  }
+  if (S.host && S.aba === 'documento') renderDocumento();
+}
+function abrirAssinatura() {
+  const a = S.assin || {};
+  if (!a.link) return;
+  window.open(a.link, '_blank', 'noopener');
+}
+async function acaoDoc(acao, btn, confirmar) {
+  if (confirmar && !confirm(confirmar)) return;
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = acao === 'docRedigir' ? 'Redigindo, até um minuto…' : acao === 'docCorrigir' ? 'Revisando…' : 'Aguarde…';
+  if (acao === 'docRedigir' && G.ligado) {
+    // fecha a parte atual da gravação para que ela entre no documento
+    btn.textContent = 'Transcrevendo a gravação…';
+    cortarSegmento();
+    await pausa(400);
+    try { await G.fila; } catch (e) {}
+    btn.textContent = 'Redigindo, até um minuto…';
+  }
+  try {
+    const r = await api({ action: acao, sala: SALA, h: CHAVE });
+    if (acao === 'docCorrigir') {
+      toast(r.corrigidos ? `${r.corrigidos} trecho(s) corrigido(s).` : 'Nenhum erro encontrado no documento.');
+      btn.disabled = false; btn.textContent = orig; return;
+    }
+    if (r.aviso) toast(r.aviso);
+    else toast(acao === 'docRedigir' ? 'Documento redigido. Revise e libere a assinatura.' : acao === 'assinLiberar' ? 'Assinaturas liberadas para todos.' : 'Assinaturas pausadas.');
+    S.assin = Object.assign({}, S.assin || {}, { doc: r.assinatura.doc, liberada: r.assinatura.liberada, docUrl: r.assinatura.docUrl, total: r.assinatura.total, assinadas: r.assinatura.assinadas });
+  } catch (e) { toast(e.message); }
+  btn.disabled = false; btn.textContent = orig;
+  renderDocumento();
+}
+function renderDocumento() {
+  const box = $('docPassos');
+  if (!box || !S.host) return;
+  const a = S.assin || {};
+  const total = a.total || 0, ok = a.assinadas || 0;
+  box.innerHTML = `
+    <div class="doc-passo ${a.doc ? 'feito' : ''}"><h3><i>${a.doc ? '✓' : '1'}</i>Redigir o documento</h3>
+      <p>${a.doc ? 'O documento foi redigido com o que foi falado até agora.' : 'A Sala transforma o registro e o chat em documento, sem encerrar a reunião.'}</p>
+      <div class="linha"><button class="btn-p ${a.doc ? '' : 'lib'}" id="dRed">${a.doc ? 'Redigir de novo' : 'Redigir agora'}</button>
+      ${a.doc && !a.liberada ? '<button class="btn-p" id="dCor">✨ Corrigir com IA</button>' : ''}
+      ${a.docUrl ? `<a href="${esc(a.docUrl)}" target="_blank" rel="noopener">Revisar no Google Docs</a>` : ''}</div></div>
+    <div class="doc-passo ${a.liberada ? 'feito' : ''}"><h3><i>${a.liberada ? '✓' : '2'}</i>Liberar a assinatura</h3>
+      <p>${a.liberada ? 'O botão de assinar está ativo para todos que entraram na reunião.' : 'O botão "Assinar" aparece para todos, mas só fica ativo quando você liberar.'}</p>
+      <div class="linha">${a.liberada
+        ? '<button class="btn-p blo" id="dPau">Pausar assinaturas</button><button class="btn-p" id="dLib">Incluir quem entrou depois</button>'
+        : `<button class="btn-p lib" id="dLib" ${a.doc ? '' : 'disabled'}>Liberar assinaturas</button>`}</div></div>
+    <div class="doc-passo ${total && ok === total ? 'feito' : ''}"><h3><i>${total && ok === total ? '✓' : '3'}</i>Acompanhar</h3>
+      ${total ? `<div class="prog"><i style="width:${Math.round(ok / total * 100)}%"></i></div><p>${ok} de ${total} ${total === 1 ? 'pessoa assinou' : 'pessoas assinaram'}. Ao assinar, cada um pode avaliar a reunião.</p>`
+        : '<p>O andamento das assinaturas aparece aqui.</p>'}</div>`;
+  const red = $('dRed'), lib = $('dLib'), pau = $('dPau');
+  if (red) red.onclick = () => acaoDoc('docRedigir', red, a.doc ? 'Redigir de novo substitui o documento e descarta as assinaturas já feitas. Continuar?' : '');
+  if (lib) lib.onclick = () => acaoDoc('assinLiberar', lib);
+  if (pau) pau.onclick = () => acaoDoc('assinPausar', pau);
+  const cor = $('dCor');
+  if (cor) cor.onclick = () => acaoDoc('docCorrigir', cor, 'A IA vai revisar ortografia, acentuação e pontuação no Google Docs, sem mudar o conteúdo. Continuar?');
+}
+
+/* ---------- Destaque e aviso de gravação (todos) ---------- */
+function aplicarVisual(c) {
+  if (!c) return;
+  const mudouFixo = (S.ctl.fixado || '') !== (c.fixado || '');
+  S.ctl = Object.assign({}, S.ctl, { fixado: c.fixado || '', gravando: !!c.gravando });
+  $('recPill').classList.toggle('oculto', !c.gravando);
+  if (mudouFixo) layoutGrade();
+}
+
+/* ---------- Sala de espera (organizador) ---------- */
+function aplicarEspera(lista) {
+  const antes = S.espera.map(x => x.id).join();
+  S.espera = lista;
+  lista.forEach(p => { if (!S.esperaVistos.has(p.id)) { S.esperaVistos.add(p.id); toast((p.nome || 'Alguém') + ' está na sala de espera.'); } });
+  const box = $('avisoEspera');
+  if (!lista.length) box.classList.add('oculto');
+  else {
+    const nomes = lista.slice(0, 2).map(p => esc(p.nome)).join(', ') + (lista.length > 2 ? ` e mais ${lista.length - 2}` : '');
+    box.innerHTML = `<span>⏳ ${lista.length === 1 ? nomes + ' está aguardando' : lista.length + ' pessoas aguardando: ' + nomes}</span>
+      ${lista.length === 1 ? `<button data-op="admitir" data-alvo="${esc(lista[0].id)}">Admitir</button>` : '<button data-op="admitirTodos">Admitir todos</button>'}
+      <button class="sec" id="bVerEspera">Ver</button>`;
+    box.classList.remove('oculto');
+    box.querySelectorAll('[data-op]').forEach(b => b.onclick = () => controlar(b.dataset.op, b.dataset.alvo || ''));
+    $('bVerEspera').onclick = () => abrirAba('pessoas');
+  }
+  if (antes !== lista.map(x => x.id).join()) { contadores(); if (S.aba === 'pessoas') renderPessoas(); }
+}
+
 /* ---------- Pessoas ---------- */
 function renderPessoas() {
   const box = $('pessoas');
   if (!box) return;
   const c = S.ctl, ctrl = c.modo === 'controlado';
   let html = '';
+  if (S.host && S.espera.length) {
+    html += `<div class="espera-box"><h3>Sala de espera (${S.espera.length})</h3>
+      ${S.espera.map(p => `<div class="pessoa" style="border:0;padding:6px 0"><span class="ini">${esc(iniciais(p.nome))}</span>
+        <span class="info"><b>${esc(p.nome)}</b><span class="selos"><span class="selo">${esc([p.cargo, p.email].filter(Boolean).join(' · ') || 'aguardando')}</span></span></span>
+        <button class="btn-p lib" data-op="admitir" data-alvo="${esc(p.id)}">Admitir</button>
+        <button class="btn-p blo" data-op="recusar" data-alvo="${esc(p.id)}">Recusar</button></div>`).join('')}
+      ${S.espera.length > 1 ? '<button class="btn-p lib cheio" data-op="admitirTodos">Admitir todos</button>' : ''}</div>`;
+  }
   if (S.host) {
     html += `<div class="modo"><p>${ctrl
       ? 'Só fala quem você liberar. Quem receber a palavra tem o microfone ligado e a fala registrada.'
@@ -658,14 +926,16 @@ function renderPessoas() {
     if (e.mao) selos.push('<span class="selo mao">✋ pediu a palavra</span>');
     if (ctrl && !p.host) selos.push(liberado ? '<span class="selo ok">com a palavra</span>' : '<span class="selo">aguardando</span>');
     selos.push(e.mic ? '<span class="selo ok">microfone ligado</span>' : '<span class="selo">microfone desligado</span>');
-    if (e.sr === false) selos.push('<span class="selo alerta">fala não registrada (navegador)</span>');
+    if (S.ctl.gravando) { if (e.mic) selos.push('<span class="selo ok">voz na gravação</span>'); }
+    else if (e.sr === false) selos.push('<span class="selo alerta">fala não registrada (navegador)</span>');
     else if (e.mic && e.sr) selos.push('<span class="selo ok">registrando</span>');
     let botoes = '';
     if (S.host && !eu && !p.host) {
-      if (ctrl) botoes = liberado
+      botoes += `<button class="btn-p" data-op="fixar" data-alvo="${esc(S.ctl.fixado === p.id ? '' : p.id)}">${S.ctl.fixado === p.id ? 'Desafixar' : 'Fixar'}</button>`;
+      if (ctrl) botoes += liberado
         ? `<button class="btn-p blo" data-op="bloquear" data-alvo="${esc(p.id)}">Encerrar palavra</button>`
         : `<button class="btn-p lib" data-op="liberar" data-alvo="${esc(p.id)}">Liberar palavra</button>`;
-      else if (e.mic) botoes = `<button class="btn-p blo" data-op="silenciar" data-alvo="${esc(p.id)}">Silenciar</button>`;
+      else if (e.mic) botoes += `<button class="btn-p blo" data-op="silenciar" data-alvo="${esc(p.id)}">Silenciar</button>`;
     }
     return `<div class="pessoa"><span class="ini">${esc(iniciais(p.nome))}</span>
       <span class="info"><b>${esc(p.nome)}${eu ? ' (você)' : ''}</b><span class="selos">${selos.join('')}</span></span>${botoes}</div>`;
@@ -724,13 +994,17 @@ async function ciclo() {
   };
   try {
     const r = await api(corpo);
+    if (r.recusado) { finalizar('Você foi retirado da reunião', 'O organizador encerrou sua participação.'); return; }
     S.falhas = 0; avisoRede('');
     S.presenca = r.peers;
     for (const sg of r.sinais) { try { await receberSinal(sg.from, sg.data); } catch (e) { console.warn('sinal', e); } }
     reconciliar();
     adicionarFalas(r.falas);
     adicionarChat(r.chat);
+    aplicarVisual(r.controle);
     aplicarControle(r.controle);
+    aplicarAssinatura(r.assinatura);
+    if (S.host) aplicarEspera(r.espera || []);
     verificarMaos();
     if (S.aba === 'pessoas') renderPessoas();
     atualizarTempo();
@@ -757,6 +1031,7 @@ function novaConexao(id, ofertante) {
     c.remoto = st;
     const el = document.querySelector(`.tile[data-id="${id}"]`);
     if (el) { const vid = el.querySelector('video'); if (vid.srcObject !== st) { vid.srcObject = st; vid.play().catch(() => {}); } }
+    if (G.ctx) atualizarFontes();
   };
   pc.onconnectionstatechange = () => {
     const s = pc.connectionState;
@@ -823,6 +1098,7 @@ function reconciliar() {
     }
   }
   layoutGrade();
+  if (G.ctx) atualizarFontes();
 }
 function garantirTile(p) {
   let el = document.querySelector(`.tile[data-id="${p.id}"]`);
@@ -831,7 +1107,7 @@ function garantirTile(p) {
   el.className = 'tile aguardando';
   el.dataset.id = p.id;
   el.innerHTML = `<video autoplay playsinline></video><div class="avatar"><b></b></div>
-    <div class="rot">${I.micOff}<span></span><em></em></div><div class="conectando">Conectando…</div><div class="mao-tile">✋ Pediu a palavra</div>`;
+    <div class="rot">${I.micOff}<span></span><em></em></div><div class="conectando">Conectando…</div><div class="mao-tile">✋ Pediu a palavra</div>${botaoFixar(p.id)}`;
   $('grade').appendChild(el);
   const c = S.conns.get(p.id);
   if (c && c.remoto) el.querySelector('video').srcObject = c.remoto;
@@ -847,13 +1123,196 @@ function atualizarTile(el, p) {
   el.classList.toggle('tela', !!e.tela);
   el.classList.toggle('mao', !!e.mao);
 }
+function botaoFixar(id) {
+  return S.host ? `<button class="fixar-btn" data-fixar="${esc(id)}" onclick="clicarFixar(this.dataset.fixar)">Fixar para todos</button>` : '';
+}
+function clicarFixar(id) { controlar('fixar', (S.ctl.fixado === id) ? '' : id); }
+function tilePorPeer(id) {
+  if (!id) return null;
+  if (id === S.peer) return document.querySelector('.tile.eu');
+  return [...document.querySelectorAll('.tile[data-id]')].find(t => t.dataset.id === id) || null;
+}
 function layoutGrade() {
   const g = $('grade');
-  const n = g.children.length;
+  const tiles = [...g.children];
+  const n = tiles.length;
+  const alvo = tilePorPeer(S.ctl && S.ctl.fixado);
+  tiles.forEach(t => {
+    t.classList.toggle('fixo', t === alvo);
+    t.style.gridColumn = ''; t.style.gridRow = '';
+    const b = t.querySelector('.fixar-btn');
+    if (b) b.innerHTML = I.pino + (t === alvo ? 'Desafixar' : 'Fixar para todos');
+  });
+  if (alvo && n > 1) {
+    g.classList.add('destaque');
+    const outros = n - 1;
+    if (mobile()) {
+      g.style.gridTemplateColumns = `repeat(${outros}, minmax(96px, 1fr))`;
+      g.style.gridTemplateRows = 'minmax(0, 1fr) 96px';
+      alvo.style.gridColumn = '1 / -1'; alvo.style.gridRow = '1';
+      tiles.forEach(t => { if (t !== alvo) t.style.gridRow = '2'; });
+    } else {
+      g.style.gridTemplateColumns = 'minmax(0, 1fr) 230px';
+      g.style.gridTemplateRows = `repeat(${outros}, minmax(110px, 1fr))`;
+      alvo.style.gridColumn = '1'; alvo.style.gridRow = `1 / span ${outros}`;
+      tiles.forEach(t => { if (t !== alvo) t.style.gridColumn = '2'; });
+    }
+    return;
+  }
+  g.classList.remove('destaque');
   const cols = n <= 1 ? 1 : n <= 4 ? 2 : n <= 9 ? 3 : 4;
   g.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
   g.style.gridTemplateRows = `repeat(${Math.ceil(n / cols)}, minmax(0, 1fr))`;
 }
+
+/* ================= Gravação do áudio (só no navegador do organizador) ================= */
+// Mistura a voz de todos, grava em partes de 3 minutos e envia cada parte ao servidor,
+// junto com quem estava falando em cada momento (medido pelo volume de cada microfone).
+const G = { ctx: null, dest: null, rec: null, seg: 0, segIni: 0, ligado: false, fontes: new Map(),
+            falantes: [], atual: null, corte: null, medidor: null, fila: Promise.resolve(), pendentes: 0, semPost: false };
+const PARTE_MS = 180000;
+
+function prepararMixer() {
+  if (G.ctx) return true;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC || !window.MediaRecorder) return false;
+  G.ctx = new AC();
+  G.dest = G.ctx.createMediaStreamDestination();
+  return true;
+}
+function ligarFonte(chave, nome, track) {
+  if (!G.ctx || !track) return;
+  const f = G.fontes.get(chave);
+  if (f && f.track === track) { f.nome = nome; return; }
+  if (f) { try { f.src.disconnect(); } catch (e) {} }
+  const src = G.ctx.createMediaStreamSource(new MediaStream([track]));
+  const an = G.ctx.createAnalyser();
+  an.fftSize = 512;
+  src.connect(an); src.connect(G.dest);
+  G.fontes.set(chave, { src, an, track, nome, buf: new Float32Array(an.fftSize) });
+}
+function atualizarFontes() {
+  if (!G.ctx) return;
+  ligarFonte('eu', S.nome, S.stream.getAudioTracks()[0]);
+  const vivos = new Set(['eu']);
+  for (const [id, c] of S.conns) {
+    const t = c.remoto && c.remoto.getAudioTracks()[0];
+    const p = S.presenca.find(x => x.id === id);
+    if (t) { ligarFonte(id, p ? p.nome : 'Participante', t); vivos.add(id); }
+  }
+  for (const k of [...G.fontes.keys()]) if (!vivos.has(k)) { try { G.fontes.get(k).src.disconnect(); } catch (e) {} G.fontes.delete(k); }
+}
+function medirFalante() {
+  let melhor = null, maior = 0.018;
+  for (const f of G.fontes.values()) {
+    f.an.getFloatTimeDomainData(f.buf);
+    let soma = 0;
+    for (let i = 0; i < f.buf.length; i++) soma += f.buf[i] * f.buf[i];
+    const rms = Math.sqrt(soma / f.buf.length);
+    if (rms > maior) { maior = rms; melhor = f.nome; }
+  }
+  const t = Date.now() - G.segIni;
+  if (melhor) {
+    if (G.atual && G.atual[2] === melhor && t - G.atual[1] < 1500) G.atual[1] = t;
+    else { fecharFalante(); G.atual = [t, t, melhor]; }
+  }
+}
+function fecharFalante() {
+  if (G.atual && G.atual[1] - G.atual[0] >= 400) G.falantes.push(G.atual.slice());
+  G.atual = null;
+}
+function novoSegmento() {
+  const tipos = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/mp4'];
+  const mime = tipos.find(m => MediaRecorder.isTypeSupported(m)) || '';
+  const rec = new MediaRecorder(G.dest.stream, mime ? { mimeType: mime, audioBitsPerSecond: 24000 } : { audioBitsPerSecond: 24000 });
+  const pedacos = [], seg = ++G.seg, ini = Date.now(), falantes = [];
+  G.falantes = falantes; G.segIni = ini; G.atual = null;
+  rec.ondataavailable = e => { if (e.data && e.data.size) pedacos.push(e.data); };
+  rec.onstop = () => {
+    const blob = new Blob(pedacos, { type: rec.mimeType || mime || 'audio/webm' });
+    if (blob.size > 2000) enviarGravacao(seg, ini, Date.now() - ini, blob, falantes);
+  };
+  rec.start(10000);
+  G.rec = rec;
+  clearTimeout(G.corte);
+  G.corte = setTimeout(cortarSegmento, PARTE_MS);
+}
+function cortarSegmento() {
+  clearTimeout(G.corte);
+  if (!G.rec) return;
+  fecharFalante();
+  const velho = G.rec;
+  G.rec = null;
+  if (G.ligado) novoSegmento();
+  try { velho.stop(); } catch (e) {}
+}
+async function iniciarGravacao(automatico) {
+  if (!prepararMixer()) { if (!automatico) toast('Este navegador não grava áudio. Use o Chrome ou o Edge.'); return; }
+  try { await G.ctx.resume(); } catch (e) {}
+  atualizarFontes();
+  G.ligado = true;
+  novoSegmento();
+  clearInterval(G.medidor);
+  G.medidor = setInterval(medirFalante, 250);
+  $('cGrav').classList.add('gravando'); $('cGrav').title = 'Parar a gravação';
+  controlar('gravar', '', { ligar: true });
+  toast(automatico ? 'A gravação do áudio começou. Ela garante a fala de todos na ata.' : 'Gravação retomada.');
+}
+async function pararGravacao() {
+  G.ligado = false;
+  clearInterval(G.medidor);
+  cortarSegmento();
+  $('cGrav').classList.remove('gravando'); $('cGrav').title = 'Gravar o áudio da reunião';
+  controlar('gravar', '', { ligar: false });
+  await pausa(300);
+  return G.fila;
+}
+function blobParaBase64(blob) {
+  return new Promise((ok, erro) => {
+    const r = new FileReader();
+    r.onload = () => ok(String(r.result).split(',')[1] || '');
+    r.onerror = erro;
+    r.readAsDataURL(blob);
+  });
+}
+function enviarGravacao(seg, ini, dur, blob, falantes) {
+  G.pendentes++;
+  G.fila = G.fila.then(async () => {
+    const dados = { seg, mime: blob.type, t0: ini, dur, falantes, b64: await blobParaBase64(blob) };
+    for (let t = 0; t < 4; t++) {
+      try { await subirParte(dados); break; }
+      catch (e) { if (t === 3) toast('Uma parte da gravação não foi enviada: ' + e.message); else await pausa(2000 * (t + 1)); }
+    }
+  }).finally(() => { G.pendentes--; });
+  return G.fila;
+}
+async function subirParte(dados) {
+  if (!G.semPost) {
+    try {
+      const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ action: 'gravParte', sala: SALA, h: CHAVE }, dados)) });
+      const j = JSON.parse(await r.text());
+      if (!j.ok) throw new Error(j.erro || 'falha');
+      return j;
+    } catch (e) {
+      if (/falha|Failed|JSON|Unexpected/.test(e.message)) G.semPost = true; else throw e;
+    }
+  }
+  // alternativa: envia em pedaços pequenos, pelo mesmo caminho do resto da sala
+  const txt = JSON.stringify(dados), TAM = 5500, n = Math.ceil(txt.length / TAM);
+  const id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  let r = null;
+  for (let i = 0; i < n; i += 4) {
+    const lote = [];
+    for (let k = i; k < Math.min(n, i + 4); k++) lote.push(api({ action: 'gravPedaco', sala: SALA, h: CHAVE, id, i: k, n, txt: txt.slice(k * TAM, (k + 1) * TAM) }));
+    const rs = await Promise.all(lote);
+    rs.forEach(x => { if (x && x.seg) r = x; });
+  }
+  return r;
+}
+window.addEventListener('beforeunload', ev => {
+  if (S.host && (G.pendentes > 0 || G.rec)) { ev.preventDefault(); ev.returnValue = ''; }
+});
 
 /* ================= Transcrição ================= */
 function iniciarRec() {
@@ -939,13 +1398,40 @@ async function finalizar(tit, msg) {
   if ((S.falasPend.length || S.chatPend.length) && S.dentro) {
     while (S.falasPend.length || S.chatPend.length) { try { await api({ action: 'sync', sala: SALA, peer: S.peer, nome: S.nome, sinais: [], falas: pegarFalas(), chat: pegarChat(), ultimaSeq: S.ultimaSeq, ultimoChat: S.ultimoChat, estado: {} }); } catch (e) { break; } }
   }
+  if (S.host && (G.ligado || G.pendentes)) {
+    telaEstado('Salvando a gravação…', 'Não feche esta aba. Isso leva alguns segundos.', '<div class="giro" aria-hidden="true"></div>');
+    try { if (G.ligado) await pararGravacao(); await G.fila; } catch (e) {}
+  }
   S.fim = true; S.dentro = false;
   pararRec(); avisarSaida();
   for (const id of [...S.conns.keys()]) fechar(id);
   if (S.tela) S.tela.getTracks().forEach(t => t.stop());
   S.stream.getTracks().forEach(t => t.stop());
   avisoRede('');
-  telaEstado(tit, msg);
+  $('avisoEspera').classList.add('oculto');
+  try { if (G.ctx) G.ctx.close(); } catch (e) {}
+  telaEstado(tit, msg, S.host ? '' : '<div id="ctaSala"></div>');
+  if (!S.host) montarCta();
+}
+
+/* ---------- Convite final: crie sua sala ---------- */
+const LOGO_G = '<svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.9 3.6-4.9 6.7-4.9z"/></svg>';
+const LOGO_M = '<svg viewBox="0 0 24 24"><path fill="#F25022" d="M1 1h10.5v10.5H1z"/><path fill="#7FBA00" d="M12.5 1H23v10.5H12.5z"/><path fill="#00A4EF" d="M1 12.5h10.5V23H1z"/><path fill="#FFB900" d="M12.5 12.5H23V23H12.5z"/></svg>';
+async function montarCta() {
+  const box = $('ctaSala');
+  if (!box) return;
+  box.className = 'cta';
+  box.innerHTML = `<h2>Crie sua sala</h2><p>Reuniões que terminam com a ata pronta e assinada. É só entrar com seu Gmail ou Outlook.</p>
+    <div class="est-acoes"><button class="btn" id="bCriar">Criar minha sala</button></div>`;
+  $('bCriar').onclick = async () => {
+    const b = $('bCriar'); b.disabled = true; b.textContent = 'Carregando…';
+    let cfg = { google: '', microsoft: '' };
+    try { cfg = await api({ action: 'loginCfg' }); } catch (e) {}
+    const pagina = location.origin + location.pathname.replace(/[^/]*$/, '') + 'entrar.html';
+    const opcoes = (cfg.google ? `<a class="btn prov" href="${pagina}?p=google">${LOGO_G}Entrar com Gmail (Google)</a>` : '') +
+                   (cfg.microsoft ? `<a class="btn prov" href="${pagina}?p=microsoft">${LOGO_M}Entrar com Outlook (Microsoft)</a>` : '');
+    box.querySelector('.est-acoes').innerHTML = opcoes || `<a class="btn" href="${API_URL}">Entrar na Sala</a>`;
+  };
 }
 window.addEventListener('pagehide', () => { if (S.dentro) avisarSaida(); });
 </script>
