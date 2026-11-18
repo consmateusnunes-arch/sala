@@ -1,0 +1,1439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sala</title>
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --palco:#191D25; --palco-2:#222731; --palco-3:#2E3441; --borda:#383F4E;
+  --claro:#E9ECF2; --apagado:#9AA3B4;
+  --tinta:#1C3FAA; --tinta-viva:#5D7EF2; --lacre:#C9382E; --selo:#3E9C72;
+  --folha:#FBFBF8; --pauta:#DDE5F3; --margem:#E7A39E; --texto:#22262E; --suave:#646B78;
+  --sans:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --serif:'Source Serif 4',Georgia,serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--palco);color:var(--claro);font:15px/1.5 var(--sans);-webkit-font-smoothing:antialiased;
+  padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--tinta-viva);outline-offset:2px}
+.oculto{display:none!important}
+svg{width:20px;height:20px;flex:none}
+
+/* ---------- Estados simples ---------- */
+.estado{min-height:100%;display:flex;align-items:center;justify-content:center;padding:32px;text-align:center}
+.estado > div{max-width:480px}
+.estado .marca{font-family:var(--serif);font-weight:600;font-size:56px;line-height:1;margin:0 0 28px;color:var(--claro)}
+.estado h1{font-family:var(--serif);font-weight:600;font-size:28px;margin:0 0 8px}
+.estado p{color:var(--apagado);margin:0}
+
+/* ---------- Antes de entrar ---------- */
+.pre{min-height:100%;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:48px;align-items:center;max-width:1160px;margin:0 auto;padding:40px 32px}
+.previa{position:relative;aspect-ratio:16/9;background:var(--palco-2);border-radius:14px;overflow:hidden}
+.previa video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.previa .sem-cam{position:absolute;inset:0;display:grid;place-items:center;color:var(--apagado);font-size:14px}
+.previa .botoes{position:absolute;left:0;right:0;bottom:14px;display:flex;justify-content:center;gap:10px}
+.pre-info .num{font-family:var(--serif);font-style:italic;color:var(--apagado);font-size:17px;margin:0}
+.pre-info h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,3.4vw,42px);line-height:1.1;margin:6px 0 10px}
+.pre-info .org{color:var(--apagado);margin:0 0 18px}
+.pre-info .pauta{margin:0 0 24px;padding-left:20px;color:#C9CFDB}
+.pre-info .pauta li{margin:2px 0}
+.campo{display:block;margin-bottom:12px}
+.campo span{display:block;font-size:13px;font-weight:600;margin-bottom:5px;color:#C9CFDB}
+.campo input{width:100%;background:var(--palco-2);border:1px solid var(--borda);border-radius:8px;padding:10px 12px}
+.campo input:focus{outline:none;border-color:var(--tinta-viva);box-shadow:0 0 0 3px rgba(93,126,242,.25)}
+.dupla{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:9px;padding:12px 20px;font-weight:600;cursor:pointer;background:var(--tinta-viva);color:#fff}
+.btn:hover{background:#4C6DE0}
+.btn:disabled{opacity:.6;cursor:progress}
+.btn.cheio{width:100%;margin-top:6px}
+.erro-msg{color:#FF8A80;font-size:13.5px;min-height:20px;margin:8px 0 0}
+.nota{font-size:13px;color:var(--apagado);margin:12px 0 0}
+.nota.alerta{color:#F2C46D}
+
+/* ---------- Botões redondos (controles) ---------- */
+.ctl{width:48px;height:48px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;background:var(--palco-3);color:var(--claro);transition:background .15s}
+.ctl:hover{background:#3A4252}
+.ctl.desligado{background:var(--lacre);color:#fff}
+.ctl.ativo{background:var(--tinta-viva);color:#fff}
+.ctl.sair{width:64px;border-radius:24px;background:var(--lacre);color:#fff}
+.ctl.sair:hover{background:#B02E25}
+.ctl:disabled{opacity:.4;cursor:not-allowed}
+
+/* ---------- Sala ---------- */
+.sala{display:grid;grid-template-columns:minmax(0,1fr) 400px;grid-template-rows:58px minmax(0,1fr) 84px;height:100vh;height:100dvh}
+body.sem-registro .sala{grid-template-columns:minmax(0,1fr) 0}
+body.sem-registro .registro{display:none}
+.topo{grid-column:1/-1;display:flex;align-items:center;gap:16px;padding:0 20px;min-width:0}
+.topo .marca{font-family:var(--serif);font-weight:600;font-size:22px}
+.topo .tit{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#C9CFDB}
+.topo .tempo{color:var(--apagado);font-size:13.5px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.aviso-rede{position:fixed;top:66px;left:50%;transform:translateX(-50%);background:#5A4512;color:#FBE3A6;padding:8px 14px;border-radius:8px;font-size:13.5px;z-index:30;max-width:90vw;text-align:center}
+
+.palco{grid-column:1;grid-row:2;padding:6px 16px 0;min-height:0}
+.grade{display:grid;gap:10px;height:100%;min-height:0}
+.tile{position:relative;background:var(--palco-2);border-radius:12px;overflow:hidden;min-height:0}
+.tile video{width:100%;height:100%;object-fit:cover;display:block;background:#11141A}
+.tile.eu video.espelho{transform:scaleX(-1)}
+.tile.tela video{object-fit:contain}
+.tile .avatar{position:absolute;inset:0;display:none;place-items:center;background:var(--palco-2)}
+.tile .avatar b{width:84px;height:84px;border-radius:50%;background:var(--tinta);display:grid;place-items:center;font-size:30px;font-weight:600;color:#fff}
+.tile.sem-video .avatar{display:grid}
+.tile .rot{position:absolute;left:10px;bottom:10px;display:flex;align-items:center;gap:6px;background:rgba(17,20,26,.72);padding:4px 10px;border-radius:7px;font-size:13px;max-width:calc(100% - 20px)}
+.tile .rot span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile .rot svg{width:15px;height:15px;color:#FF8A80;display:none}
+.tile.mudo .rot svg{display:block}
+.tile .rot em{font-style:normal;color:var(--apagado);font-size:12px}
+.tile .conectando{position:absolute;top:10px;right:10px;font-size:12px;color:var(--apagado);background:rgba(17,20,26,.72);padding:3px 9px;border-radius:6px;display:none}
+.tile.aguardando .conectando{display:block}
+
+.controles{grid-column:1;grid-row:3;display:flex;align-items:center;justify-content:center;gap:12px}
+
+/* O registro: folha pautada sobre a mesa escura */
+.registro{grid-column:2;grid-row:2/4;margin:6px 16px 16px 0;display:flex;flex-direction:column;min-height:0;
+  background:var(--folha);color:var(--texto);border-radius:4px;box-shadow:0 24px 50px -20px rgba(0,0,0,.6);overflow:hidden}
+.registro header{padding:16px 20px 12px 20px;border-bottom:1px solid #E3E7EF;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.registro h2{font-family:var(--serif);font-weight:600;font-size:20px;margin:0}
+.registro header p{margin:2px 0 0;color:var(--suave);font-size:12.5px}
+.registro .fechar{background:none;border:0;color:var(--suave);cursor:pointer;padding:4px;display:none}
+.registro .aviso-sr{background:#FBEFD8;color:#6B4705;font-size:12.5px;padding:8px 20px}
+.abas{display:flex;gap:2px;margin-top:10px}
+.abas button{border:0;background:none;padding:6px 10px 8px;font-weight:600;font-size:13.5px;color:var(--suave);cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px}
+.abas button.ativo{color:var(--texto);border-bottom-color:var(--tinta)}
+.abas .cont{min-width:18px;height:18px;border-radius:9px;background:var(--lacre);color:#fff;font-size:11px;display:inline-grid;place-items:center;padding:0 5px}
+.painel-aba{flex:1;display:flex;flex-direction:column;min-height:0}
+.chat-lista{flex:1;overflow-y:auto;padding:14px 18px}
+.msg{margin:0 0 12px}
+.msg .quem{font-weight:600;font-size:13px;color:var(--tinta)}
+.msg.minha .quem{color:#2F7D5B}
+.msg .h{font-size:11.5px;color:#9AA3B2;margin-left:6px}
+.msg p{margin:2px 0 0;font-size:14.5px;line-height:1.45;white-space:pre-wrap;word-wrap:break-word}
+.msg.pend{opacity:.55}
+.chat-form{display:flex;gap:8px;padding:10px 12px;border-top:1px solid #E3E7EF;background:#fff}
+.chat-form textarea{flex:1;resize:none;border:1px solid #DCE2EC;border-radius:8px;padding:8px 10px;font:inherit;font-size:14px;color:var(--texto);height:42px;max-height:110px}
+.chat-form textarea:focus{outline:none;border-color:var(--tinta);box-shadow:0 0 0 3px #E8EDFB}
+.chat-form button{border:0;border-radius:8px;background:var(--tinta);color:#fff;font-weight:600;padding:0 14px;cursor:pointer}
+.pessoas{flex:1;overflow-y:auto;padding:6px 18px 14px}
+.modo{background:#F3F5F9;border-radius:10px;padding:12px;margin:10px 0 6px}
+.modo p{margin:0 0 8px;font-size:12.5px;color:var(--suave)}
+.seg{display:flex;background:#fff;border:1px solid #DCE2EC;border-radius:8px;padding:2px}
+.seg button{flex:1;border:0;background:none;border-radius:6px;padding:6px;font-weight:600;font-size:13px;color:var(--suave);cursor:pointer}
+.seg button.ativo{background:var(--tinta);color:#fff}
+.btn-p{border:1px solid #DCE2EC;background:#fff;color:var(--texto);border-radius:7px;padding:5px 10px;font-weight:600;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.btn-p:hover{border-color:#B9C3D4}
+.btn-p.lib{background:var(--tinta);border-color:var(--tinta);color:#fff}
+.btn-p.blo{color:var(--lacre);border-color:#EBC4C0}
+.btn-p.cheio{width:100%;margin-top:8px}
+.pessoa{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #EEF1F5}
+.pessoa .ini{width:34px;height:34px;border-radius:50%;background:#E8EDFB;color:var(--tinta);display:grid;place-items:center;font-weight:700;font-size:12.5px;flex:none}
+.pessoa .info{flex:1;min-width:0}
+.pessoa .info b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.selos{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px}
+.selo{font-size:11px;font-weight:600;padding:1px 7px;border-radius:999px;background:#F0F2F6;color:var(--suave)}
+.selo.ok{background:#E2F1E9;color:#2F7D5B}
+.selo.alerta{background:#FBE7E5;color:#B3261E}
+.selo.mao{background:#FBEFD8;color:#8F5E07}
+.tile .mao-tile{position:absolute;top:10px;left:10px;background:#F2C46D;color:#3A2A05;font-size:12.5px;font-weight:700;padding:3px 9px;border-radius:6px;display:none}
+.tile.mao .mao-tile{display:block}
+.ctl{position:relative}
+.ctl .ponto{position:absolute;top:4px;right:4px;min-width:16px;height:16px;border-radius:8px;background:var(--lacre);color:#fff;font-size:10px;font-weight:700;display:grid;place-items:center;padding:0 4px}
+.ctl.travado{background:#4A3A3A;color:#C9A9A6}
+.ctl.mao-on{background:#F2C46D;color:#3A2A05}
+.ctl.assinar{width:auto;border-radius:24px;padding:0 18px;gap:8px;display:flex;align-items:center;font-weight:600;font-size:14px}
+.ctl.assinar:disabled{opacity:1;background:var(--palco-3);color:#7D8596;cursor:not-allowed}
+.ctl.assinar.pronto{background:#2F9E6E;color:#fff;animation:chamar 2s ease-in-out infinite}
+.ctl.assinar.feito{background:#24493B;color:#9FE0C0}
+@keyframes chamar{0%,100%{box-shadow:0 0 0 0 rgba(62,156,114,.6)}50%{box-shadow:0 0 0 8px rgba(62,156,114,0)}}
+@media (prefers-reduced-motion:reduce){.ctl.assinar.pronto{animation:none}}
+@media (max-width:900px){.ctl.assinar span{display:none}.ctl.assinar{padding:0 12px}}
+/* Autorização */
+.consent{display:flex;gap:10px;align-items:flex-start;background:#20262F;border:1px solid var(--borda);border-radius:10px;padding:12px 14px;margin:4px 0 14px;cursor:pointer;font-size:13.5px;color:#C9CFDB;line-height:1.45}
+.consent input{width:18px;height:18px;margin-top:2px;flex:none;accent-color:var(--tinta-viva)}
+.consent b{color:var(--claro)}
+.consent.ok{border-color:#3E9C72;background:#1E2B27}
+.previa .pedir{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--apagado);font-size:14px}
+.previa .pedir svg{width:34px;height:34px;display:block;margin:0 auto 10px;color:#6F7889}
+/* Espera e fim */
+.giro{width:38px;height:38px;border-radius:50%;border:3px solid #2E3441;border-top-color:var(--tinta-viva);margin:22px auto 6px;animation:gir .9s linear infinite}
+@keyframes gir{to{transform:rotate(360deg)}}
+.est-acoes{display:flex;flex-direction:column;gap:10px;align-items:center;margin-top:22px}
+.est-acoes .btn{min-width:260px}
+.est-acoes .btn.sec{background:var(--palco-3);color:var(--claro)}
+.cta{margin-top:34px;padding-top:24px;border-top:1px solid var(--borda)}
+.cta h2{font-family:var(--serif);font-weight:600;font-size:22px;margin:0 0 6px;color:var(--claro)}
+.cta p{margin:0 0 4px}
+.est-acoes a.btn{text-decoration:none}
+.fixar-btn svg{width:13px;height:13px;vertical-align:-2px;margin-right:4px}
+.btn.prov{background:#fff;color:#22262E;gap:10px}
+.btn.prov:hover{background:#EEF2F8}
+.btn.prov svg{width:18px;height:18px}
+/* Gravação, espera do organizador e destaque */
+.rec-pill{display:inline-flex;align-items:center;gap:6px;background:#3A1F22;color:#FF9A92;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.rec-pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#FF5A4E;animation:pisca 1.4s ease-in-out infinite}
+@keyframes pisca{50%{opacity:.25}}
+.ctl.gravando{background:var(--lacre);color:#fff}
+.aviso-espera{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:45;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+  background:#F2C46D;color:#2E2205;font-weight:600;font-size:14px;padding:10px 14px;border-radius:12px;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);max-width:calc(100vw - 24px)}
+.aviso-espera button{border:0;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;background:#2E2205;color:#F2C46D}
+.aviso-espera button.sec{background:transparent;color:#2E2205;text-decoration:underline}
+.espera-box{background:#FFF7E6;border:1px solid #F2D8A0;border-radius:10px;padding:10px 12px;margin:10px 0}
+.espera-box h3{margin:0 0 6px;font-size:13.5px;color:#7A5205}
+.fixar-btn{position:absolute;top:8px;right:8px;z-index:3;border:0;border-radius:8px;padding:5px 9px;font-size:12px;font-weight:700;cursor:pointer;
+  background:rgba(17,20,26,.72);color:#fff;opacity:0;transition:opacity .15s}
+.tile:hover .fixar-btn,.tile.fixo .fixar-btn,.fixar-btn:focus-visible{opacity:1}
+.tile.fixo{outline:2px solid var(--tinta-viva);outline-offset:-2px}
+.grade.destaque{overflow-y:auto}
+@media (prefers-reduced-motion:reduce){.giro,.rec-pill::before{animation:none}}
+.campo-cod input{font-family:'Courier New',monospace;font-size:18px;letter-spacing:.2em;text-transform:uppercase}
+.campo-cod input::placeholder{font-family:var(--sans);font-size:14px;letter-spacing:0;text-transform:none}
+.doc-passos{padding:14px 18px;overflow-y:auto;flex:1}
+.doc-passo{border:1px solid #E3E7EF;border-radius:10px;padding:14px;margin-bottom:12px}
+.doc-passo h3{margin:0 0 4px;font-size:14.5px;display:flex;align-items:center;gap:8px}
+.doc-passo h3 i{font-style:normal;width:20px;height:20px;border-radius:50%;background:#E8EDFB;color:var(--tinta);display:grid;place-items:center;font-size:11px;font-weight:700}
+.doc-passo.feito h3 i{background:#2F7D5B;color:#fff}
+.doc-passo p{margin:0 0 10px;font-size:13px;color:var(--suave)}
+.doc-passo .linha{display:flex;gap:8px;flex-wrap:wrap}
+.doc-passo a{color:var(--tinta);font-weight:600;font-size:13px}
+.prog{height:8px;background:#EEF1F6;border-radius:4px;overflow:hidden;margin:6px 0 4px}
+.prog i{display:block;height:100%;background:#2F7D5B;border-radius:4px}
+.folha{
+  --l:30px;flex:1;overflow-y:auto;
+  background-image:
+    linear-gradient(to right,transparent 58px,var(--margem) 58px,var(--margem) 59px,transparent 59px),
+    repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--l) - 1px),var(--pauta) calc(var(--l) - 1px),var(--pauta) var(--l));
+  background-attachment:local;
+  padding:var(--l) 18px var(--l) 70px;font-family:var(--serif);font-size:15.5px;line-height:var(--l)}
+.fala{position:relative;margin:0}
+.fala .h{position:absolute;left:-64px;width:48px;text-align:right;font-family:var(--sans);font-size:11px;color:#9AA3B2;font-variant-numeric:tabular-nums}
+.fala b{font-weight:600;color:var(--tinta)}
+.fala.minha b{color:#2F7D5B}
+.interim{color:#8C94A3;font-style:italic;margin:0}
+.folha .vazio{color:#8C94A3;font-style:italic;margin:0}
+
+.fundo{position:fixed;inset:0;background:rgba(8,10,14,.6);display:flex;align-items:center;justify-content:center;padding:16px;z-index:60}
+.caixa{background:var(--palco-2);border:1px solid var(--borda);border-radius:14px;padding:26px;width:min(420px,100%)}
+.caixa h2{font-family:var(--serif);font-weight:600;font-size:23px;margin:0 0 6px}
+.caixa p{color:var(--apagado);margin:0 0 20px}
+.caixa .acoes{display:flex;flex-direction:column;gap:8px}
+.caixa .btn.sec{background:var(--palco-3);color:var(--claro)}
+.caixa .btn.perigo{background:var(--lacre)}
+.toast{position:fixed;left:50%;bottom:104px;transform:translateX(-50%);background:var(--claro);color:var(--texto);padding:9px 16px;border-radius:9px;font-size:14px;z-index:70;opacity:0;transition:opacity .2s;pointer-events:none}
+.toast.on{opacity:1}
+
+@media (max-width:900px){
+  .pre{grid-template-columns:1fr;gap:24px;padding:20px 16px}
+  .sala{grid-template-columns:1fr}
+  body.sem-registro .sala{grid-template-columns:1fr}
+  .registro{position:fixed;left:8px;right:8px;bottom:92px;top:30%;margin:0;z-index:40}
+  .registro .fechar{display:block}
+  body:not(.ver-registro) .registro{display:none}
+  .palco{padding:4px 8px 0}
+  .topo{padding:0 12px}
+  .controles{gap:8px}
+  .ctl{width:44px;height:44px}
+  .dupla{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- Carregando / erro / fim -->
+<div id="telaEstado" class="estado"><div><p class="marca"><img src="logo-sala.png" alt="Sala" style="width:min(320px,80vw);height:auto;filter:brightness(0) invert(1)"></p><h1 id="estTit">Abrindo a sala…</h1><p id="estMsg"></p><div id="estExtra"></div></div></div>
+
+<!-- Antes de entrar -->
+<div id="telaPre" class="pre oculto">
+  <div>
+    <div class="previa">
+      <video id="previa" autoplay playsinline muted></video>
+      <div class="pedir" id="pedirMidia"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/></svg>Câmera e microfone ficam desligados até você autorizar ao lado.</div></div>
+      <div class="sem-cam oculto" id="semCamPre">Câmera desligada</div>
+      <div class="botoes">
+        <button class="ctl" id="pMic" title="Ligar ou desligar microfone"></button>
+        <button class="ctl" id="pCam" title="Ligar ou desligar câmera"></button>
+      </div>
+    </div>
+    <p class="nota" id="notaMidia"></p>
+  </div>
+  <div class="pre-info">
+    <p class="num" id="preNum"></p>
+    <h1 id="preTit"></h1>
+    <p class="org" id="preOrg"></p>
+    <ol class="pauta" id="prePauta"></ol>
+    <form id="fEntrar">
+      <label class="campo"><span>Seu nome completo</span><input id="iNome" maxlength="80" autocomplete="name" required></label>
+      <div class="dupla">
+        <label class="campo"><span id="rotEmail">E-mail</span><input id="iEmail" type="email" maxlength="120" autocomplete="email"></label>
+        <label class="campo"><span>Cargo ou função</span><input id="iCargo" maxlength="80"></label>
+      </div>
+      <label class="campo"><span>Celular com WhatsApp (opcional)</span><input id="iTel" type="tel" maxlength="20" autocomplete="tel" placeholder="(00) 00000-0000"></label>
+      <label class="campo campo-cod oculto" id="campoCodigo"><span>Código de acesso</span><input id="iCodigo" maxlength="12" autocomplete="off" placeholder="Enviado pelo organizador"></label>
+      <label class="consent" id="caixaConsent"><input type="checkbox" id="iConsent">
+        <span>Autorizo a Sala a captar minha <b>voz</b> e minha <b>imagem</b> durante esta reunião, para transmitir aos participantes, <b>gravar o áudio</b> e redigir a ata. Posso desligar câmera e microfone a qualquer momento.</span></label>
+      <button class="btn cheio" id="bEntrar" type="submit" disabled>Entrar na reunião</button>
+      <p class="erro-msg" id="erroEntrar"></p>
+      <p class="nota" id="notaSR"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Reunião -->
+<div id="telaSala" class="sala oculto">
+  <div class="topo">
+    <span class="marca"><img src="logo-mini.png" alt="" style="height:26px;vertical-align:-6px;margin-right:6px">Sala</span>
+    <span class="tit" id="salaTit"></span>
+    <span class="rec-pill oculto" id="recPill" title="O áudio desta reunião está sendo gravado para a ata">Gravando</span>
+    <span class="tempo" id="tempo"></span>
+  </div>
+  <div class="palco"><div class="grade" id="grade"></div></div>
+  <div class="controles">
+    <button class="ctl" id="cMic" title="Microfone"></button>
+    <button class="ctl" id="cCam" title="Câmera"></button>
+    <button class="ctl" id="cTela" title="Apresentar a tela"></button>
+    <button class="ctl oculto" id="cGrav" title="Gravar o áudio da reunião"></button>
+    <button class="ctl oculto" id="cMao" title="Levantar a mão"></button>
+    <button class="ctl" id="cChat" title="Chat"></button>
+    <button class="ctl ativo" id="cReg" title="Registro e participantes"></button>
+    <button class="ctl assinar" id="cAss" disabled title="O organizador ainda não liberou a assinatura"></button>
+    <button class="ctl oculto" id="cLink" title="Copiar convite (link + código)"></button>
+    <button class="ctl sair" id="cSair" title="Sair da reunião"></button>
+  </div>
+  <section class="registro" aria-label="Registro ao vivo">
+    <header style="padding-bottom:0">
+      <div style="flex:1;min-width:0"><h2 id="abaTit">Registro ao vivo</h2><p id="abaSub">Sua fala entra aqui enquanto o microfone estiver ligado.</p>
+        <nav class="abas">
+          <button data-aba="registro" class="ativo">Registro</button>
+          <button data-aba="chat">Chat <span class="cont oculto" id="contChat"></span></button>
+          <button data-aba="pessoas">Pessoas <span class="cont oculto" id="contMao"></span></button>
+          <button data-aba="documento" class="oculto">Documento</button>
+        </nav>
+      </div>
+      <button class="fechar" id="fecharReg" title="Fechar painel"></button>
+    </header>
+    <div class="painel-aba" id="abaRegistro">
+      <div class="aviso-sr oculto" id="avisoSR">Este navegador não transcreve fala. Use Chrome ou Edge no computador para que suas falas entrem no documento. Você pode escrever no chat.</div>
+      <div class="folha" id="folha"><p class="vazio" id="folhaVazia">As falas aparecem aqui assim que alguém começar a falar.</p><p class="interim" id="interim"></p></div>
+    </div>
+    <div class="painel-aba oculto" id="abaChat">
+      <div class="chat-lista" id="chatLista"><p class="vazio" id="chatVazio" style="color:#8C94A3;font-style:italic;margin:0">Perguntas e avisos por escrito. As mensagens também entram no documento.</p></div>
+      <form class="chat-form" id="fChat"><textarea id="chatTxt" maxlength="500" placeholder="Escreva uma mensagem" aria-label="Mensagem"></textarea><button type="submit">Enviar</button></form>
+    </div>
+    <div class="painel-aba oculto" id="abaPessoas"><div class="pessoas" id="pessoas"></div></div>
+    <div class="painel-aba oculto" id="abaDocumento"><div class="doc-passos" id="docPassos"></div></div>
+  </section>
+</div>
+
+<div id="avisoRede" class="aviso-rede oculto"></div>
+<div id="avisoEspera" class="aviso-espera oculto" role="status"></div>
+<div id="modal"></div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+ *  CONFIGURAÇÃO: cole aqui a URL do App da Web do Apps Script
+ * ============================================================ */
+const API_URL = 'https://script.google.com/macros/s/AKfycbxZOnRToy_FH5CxU3u5XWyDNPgF4GdCtkUtXMVj3QA35CgvAvFlCL4hi2l1rWjMseRx/exec';
+
+const ICE = [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }];
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+const qs = new URLSearchParams(location.search);
+const SALA = (qs.get('s') || '').trim();
+const CHAVE = qs.get('h') || '';
+const ENCERRADOS = ['Encerrada', 'Documento gerado', 'Em assinatura', 'Concluída'];
+
+const S = {
+  info: null, peer: null, host: false, nome: '', email: '', cargo: '',
+  stream: new MediaStream(), tela: null, mic: false, cam: false, temMic: false, temCam: false,
+  ultimaSeq: 0, saida: [], falasPend: [], presenca: [], conns: new Map(),
+  ultimoChat: 0, chatPend: [], chatEnviando: [], naoLidas: 0, aba: 'registro',
+  ctl: { modo: 'livre', lib: {}, mudo: {} }, podeFalar: true, mao: false, ultMudo: 0, maos: new Set(),
+  dentro: false, fim: false, falhas: 0, entrouEm: 0,
+  rec: null, recAtivo: false, recBloqueado: false,
+  espera: [], esperaVistos: new Set(), aguardando: false, midiaAberta: false
+};
+const $ = id => document.getElementById(id);
+
+const I = {
+  mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/></svg>',
+  micOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/><path d="M4 4l16 16"/></svg>',
+  cam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/></svg>',
+  camOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/><path d="M3 3l18 18"/></svg>',
+  tela: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8"/><path d="M12 16v4"/></svg>',
+  assinar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/><path d="M14 21h7"/></svg>',
+  reg: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l4 4v14H6z"/><path d="M9 11h7"/><path d="M9 15h7"/><path d="M9 7h3"/></svg>',
+  link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>',
+  sair: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 14.5c4.7-4.2 12.3-4.2 17 0l-1.8 2.6-3.9-1.1v-2.6a9.5 9.5 0 0 0-5.6 0V16l-3.9 1.1z"/></svg>',
+  mao: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12"/><path d="M11 11.5v-8a1.5 1.5 0 0 1 3 0V12"/><path d="M14 11.5V6a1.5 1.5 0 0 1 3 0v8.5a6.5 6.5 0 0 1-6.5 6.5h-.6a6 6 0 0 1-4.6-2.2L3.6 16a1.5 1.5 0 0 1 2.3-1.9L8 16.2"/></svg>',
+  chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20.5l1.4-4.6A8 8 0 1 1 21 12z"/></svg>',
+  pino: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 6 3 3H7l3-3z"/><path d="M12 13v7"/></svg>',
+  grav: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/></svg>',
+  x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>'
+};
+
+/* ================= Utilidades ================= */
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function iniciais(n) { return String(n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join('').toUpperCase(); }
+function tipoLabel(t) { return ({ 'Ata': 'Ata', 'Relatório': 'Relatório', 'Reunião': 'Resumo de reunião' })[t] || t; }
+async function api(corpo, opcoes) {
+  const url = API_URL + '?d=' + encodeURIComponent(JSON.stringify(corpo)) + '&_=' + Date.now();
+  const r = await fetch(url, Object.assign({ method: 'GET' }, opcoes || {}));
+  const txt = await r.text();
+  let j;
+  try { j = JSON.parse(txt); }
+  catch (e) {
+    const t = (txt.match(/<title>([^<]*)/i) || [])[1];
+    throw new Error('O servidor da Sala respondeu de forma inesperada' + (t ? ' (' + t.trim() + ')' : '') + '.');
+  }
+  if (!j.ok) throw new Error(j.erro || 'O servidor da Sala não respondeu.');
+  return j;
+}
+/* Sinais de vídeo são grandes: vão em pedaços, todos ao mesmo tempo */
+async function enviarSinal(para, data) {
+  const txt = JSON.stringify(data), TAM = 1400;
+  const n = Math.ceil(txt.length / TAM);
+  const id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  const envios = [];
+  for (let i = 0; i < n; i++) {
+    envios.push(enviarParte({ action: 'parte', sala: SALA, peer: S.peer, to: para, id, i, n, txt: txt.slice(i * TAM, (i + 1) * TAM) }));
+  }
+  await Promise.all(envios);
+}
+async function enviarParte(corpo) {
+  for (let t = 0; t < 4; t++) {
+    try { await api(corpo); return; }
+    catch (e) { await new Promise(r => setTimeout(r, 700 * (t + 1))); }
+  }
+}
+function pegarFalas() {
+  const out = [];
+  let total = 0;
+  while (S.falasPend.length && total < 1200) { const f = S.falasPend.shift(); out.push(f); total += f.length; }
+  return out;
+}
+function mostrar(qual) { ['telaEstado', 'telaPre', 'telaSala'].forEach(id => $(id).classList.toggle('oculto', id !== qual)); }
+function telaEstado(tit, msg, extra) {
+  $('estTit').textContent = tit; $('estMsg').textContent = msg || '';
+  $('estExtra').innerHTML = extra || '';
+  mostrar('telaEstado');
+}
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2600); }
+function avisoRede(msg) { const a = $('avisoRede'); a.textContent = msg; a.classList.toggle('oculto', !msg); }
+function linkParticipantes() { return location.origin + location.pathname + '?s=' + encodeURIComponent(SALA); }
+async function copiar(t) {
+  try { await navigator.clipboard.writeText(t); toast('Link copiado.'); }
+  catch (e) { prompt('Copie o link da reunião:', t); }
+}
+
+/* ================= Início ================= */
+(async function iniciar() {
+  if (!/^https:\/\//.test(API_URL)) return telaEstado('A sala ainda não foi configurada', 'Cole a URL do App da Web na variável API_URL deste arquivo.');
+  if (!SALA) return telaEstado('Link incompleto', 'Abra o link exatamente como você recebeu do organizador.');
+  try { S.info = await api({ action: 'info', sala: SALA, h: CHAVE }); }
+  catch (e) { return telaEstado('Não foi possível abrir a sala', e.message); }
+  if (ENCERRADOS.includes(S.info.status)) return telaEstado('Esta reunião já foi encerrada', 'O documento está com o organizador.');
+  montarPre();
+})();
+
+function montarPre() {
+  const i = S.info;
+  document.title = i.titulo + ' | Sala';
+  $('preNum').textContent = tipoLabel(i.tipo) + ' nº ' + i.numero;
+  $('preTit').textContent = i.titulo;
+  $('preOrg').textContent = i.organizador ? 'Organização: ' + i.organizador + (i.host ? ' (você)' : '') : (i.host ? 'Você é o organizador desta reunião.' : '');
+  $('prePauta').innerHTML = (i.pauta || '').split('\n').filter(x => x.trim()).map(x => `<li>${esc(x)}</li>`).join('');
+  try {
+    const p = JSON.parse(localStorage.getItem('sala_eu') || '{}');
+    $('iNome').value = p.nome || ''; $('iEmail').value = p.email || ''; $('iCargo').value = p.cargo || ''; $('iTel').value = p.tel || '';
+  } catch (e) {}
+  if (!SR) { $('notaSR').textContent = 'Seu navegador não transcreve fala. Use Chrome ou Edge no computador para que suas falas entrem no documento.'; $('notaSR').classList.add('alerta'); }
+  else $('notaSR').textContent = 'Use fone de ouvido: assim a transcrição registra só a sua voz.';
+  $('iConsent').onchange = async () => {
+    const ok = $('iConsent').checked;
+    $('caixaConsent').classList.toggle('ok', ok);
+    $('bEntrar').disabled = !ok;
+    if (ok && !S.midiaAberta) await abrirMidia();
+    if (!ok && S.midiaAberta) fecharMidia();
+  };
+  atualizarBotoesPre();
+  $('pMic').onclick = () => { alternarMic(); atualizarBotoesPre(); };
+  $('pCam').onclick = () => { alternarCam(); atualizarBotoesPre(); };
+  $('fEntrar').addEventListener('submit', entrar);
+  if (i.exigeEmail) { $('rotEmail').textContent = 'E-mail (sua chave para assinar)'; $('iEmail').required = true; }
+  if (i.precisaCodigo) {
+    $('campoCodigo').classList.remove('oculto');
+  }
+  mostrar('telaPre');
+}
+
+async function abrirMidia() {
+  const audio = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+  try {
+    S.stream = await navigator.mediaDevices.getUserMedia({ audio, video: { width: { ideal: 960 }, height: { ideal: 540 } } });
+  } catch (e) {
+    try {
+      S.stream = await navigator.mediaDevices.getUserMedia({ audio });
+      $('notaMidia').textContent = 'Câmera indisponível. Você entra só com áudio.';
+    } catch (e2) {
+      S.stream = new MediaStream();
+      $('notaMidia').textContent = 'Não foi possível acessar câmera e microfone. Permita o acesso no ícone do cadeado, ao lado do endereço, e recarregue a página. Você ainda pode entrar para ver e ouvir.';
+    }
+  }
+  S.temMic = S.stream.getAudioTracks().length > 0;
+  S.temCam = S.stream.getVideoTracks().length > 0;
+  S.mic = S.temMic; S.cam = S.temCam;
+  S.midiaAberta = true;
+  $('pedirMidia').classList.add('oculto');
+  $('previa').srcObject = S.stream;
+  atualizarBotoesPre();
+}
+function fecharMidia() {
+  S.stream.getTracks().forEach(t => t.stop());
+  S.stream = new MediaStream();
+  S.temMic = S.temCam = S.mic = S.cam = false; S.midiaAberta = false;
+  $('previa').srcObject = null;
+  $('pedirMidia').classList.remove('oculto');
+  $('notaMidia').textContent = '';
+  atualizarBotoesPre();
+}
+
+function atualizarBotoesPre() {
+  botaoMicCam($('pMic'), $('pCam'));
+  $('semCamPre').classList.toggle('oculto', S.cam || !S.midiaAberta);
+  $('previa').style.visibility = S.cam ? 'visible' : 'hidden';
+}
+function botaoMicCam(bMic, bCam) {
+  bMic.innerHTML = S.mic ? I.mic : I.micOff;
+  bMic.classList.toggle('desligado', !S.mic);
+  bMic.disabled = !S.temMic;
+  bMic.title = S.mic ? 'Desligar microfone' : 'Ligar microfone';
+  bCam.innerHTML = S.cam ? I.cam : I.camOff;
+  bCam.classList.toggle('desligado', !S.cam);
+  bCam.disabled = !S.temCam;
+  bCam.title = S.cam ? 'Desligar câmera' : 'Ligar câmera';
+}
+
+/* ================= Entrar ================= */
+async function entrar(ev) {
+  ev.preventDefault();
+  $('erroEntrar').textContent = '';
+  S.nome = $('iNome').value.trim(); S.email = $('iEmail').value.trim(); S.cargo = $('iCargo').value.trim();
+  if (S.nome.length < 3) { $('erroEntrar').textContent = 'Digite seu nome completo. Ele vai aparecer no documento.'; return; }
+  if (S.info.exigeEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(S.email)) { $('erroEntrar').textContent = 'Digite seu e-mail: ele é a sua chave para assinar o documento no final.'; $('iEmail').focus(); return; }
+  if (!$('iConsent').checked) { $('erroEntrar').textContent = 'Para entrar, marque a autorização de voz e imagem.'; return; }
+  if (S.info.precisaCodigo && !$('iCodigo').value.trim()) { $('erroEntrar').textContent = 'Digite o código de acesso que o organizador enviou.'; $('iCodigo').focus(); return; }
+  S.tel = $('iTel').value.trim();
+  try { localStorage.setItem('sala_eu', JSON.stringify({ nome: S.nome, email: S.email, cargo: S.cargo, tel: S.tel })); } catch (e) {}
+  const b = $('bEntrar'); b.disabled = true; b.textContent = 'Entrando…';
+  try {
+    const r = await api({ action: 'entrar', sala: SALA, h: CHAVE, nome: S.nome, email: S.email, cargo: S.cargo,
+      codigo: $('iCodigo').value, telefone: S.tel, consentiu: true });
+    S.peer = r.peer; S.host = r.host;
+    if (r.pauta) S.info.pauta = r.pauta;
+    if (r.aguardando) { aguardar(); return; }
+  } catch (e) {
+    $('erroEntrar').textContent = e.message;
+    b.disabled = false; b.textContent = 'Entrar na reunião';
+    return;
+  }
+  entrarNaSala();
+}
+function entrarNaSala() {
+  S.dentro = true; S.entrouEm = Date.now();
+  montarSala();
+  iniciarRec();
+  ciclo();
+  if (S.host) iniciarGravacao(true);
+}
+const pausa = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- Sala de espera (participante) ---------- */
+async function aguardar() {
+  S.aguardando = true;
+  telaEstado('Aguardando o organizador', 'Sua entrada foi pedida. O organizador vai liberar em instantes.',
+    `<div class="giro" aria-hidden="true"></div><div class="est-acoes"><button class="btn sec" id="bDesistir">Sair</button></div>`);
+  $('bDesistir').onclick = () => { S.aguardando = false; avisarSaida(); fimParticipante('Você saiu', 'Sua entrada na reunião foi cancelada.'); };
+  while (S.aguardando && !S.fim) {
+    try {
+      const r = await api({ action: 'sync', sala: SALA, peer: S.peer, nome: S.nome });
+      if (!S.aguardando) return;
+      if (r.recusado) { S.aguardando = false; return fimParticipante('Entrada não autorizada', 'O organizador não liberou sua entrada nesta reunião.'); }
+      if (ENCERRADOS.includes(r.status)) { S.aguardando = false; return fimParticipante('Esta reunião foi encerrada', 'O documento está com o organizador.'); }
+      if (!r.aguardando) { S.aguardando = false; toast('O organizador liberou sua entrada.'); entrarNaSala(); return; }
+      $('estMsg').textContent = r.organizadorPresente
+        ? 'O organizador já foi avisado e vai liberar sua entrada em instantes.'
+        : 'O organizador ainda não entrou. Assim que ele chegar, poderá liberar sua entrada.';
+    } catch (e) {
+      if (/não foi encontrada/.test(e.message)) { S.aguardando = false; return fimParticipante('Sua entrada expirou', 'Abra de novo o link da reunião.'); }
+    }
+    await pausa(2000);
+  }
+}
+function fimParticipante(tit, msg) {
+  S.fim = true;
+  try { S.stream.getTracks().forEach(t => t.stop()); } catch (e) {}
+  telaEstado(tit, msg, S.host ? '' : '<div id="ctaSala"></div>');
+  if (!S.host) montarCta();
+}
+
+/* ================= Sala ================= */
+function montarSala() {
+  $('salaTit').textContent = tipoLabel(S.info.tipo) + ' nº ' + S.info.numero + ', ' + S.info.titulo;
+  $('cGrav').innerHTML = I.grav;
+  if (S.host && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext)) {
+    $('cGrav').classList.remove('oculto');
+    $('cGrav').onclick = () => { if (G.ligado) pararGravacao(); else iniciarGravacao(false); };
+  }
+  $('cTela').innerHTML = I.tela; $('cReg').innerHTML = I.reg; $('cLink').innerHTML = I.link; $('cSair').innerHTML = I.sair;
+  $('cMao').innerHTML = I.mao; $('cChat').innerHTML = I.chat + '<span class="ponto oculto" id="pontoChat"></span>';
+  $('fecharReg').innerHTML = I.x;
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia || !S.temCam) $('cTela').classList.add('oculto');
+  if (!SR) $('avisoSR').classList.remove('oculto');
+  if (!S.host) $('cMao').classList.remove('oculto');
+  if (window.matchMedia('(max-width:900px)').matches) $('cReg').classList.remove('ativo');
+  $('cMao').onclick = alternarMao;
+  $('cChat').onclick = () => clicarAba('chat');
+  document.querySelectorAll('.abas button').forEach(b => b.onclick = () => abrirAba(b.dataset.aba));
+  $('fChat').addEventListener('submit', ev => { ev.preventDefault(); enviarChat(); });
+  $('chatTxt').addEventListener('keydown', ev => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); enviarChat(); } });
+
+  $('cMic').onclick = () => { alternarMic(); atualizarControles(); };
+  $('cCam').onclick = () => { alternarCam(); atualizarControles(); };
+  $('cTela').onclick = alternarTela;
+  $('cReg').onclick = () => clicarAba(S.aba === 'chat' ? 'registro' : S.aba);
+  $('fecharReg').onclick = () => mostrarPainel(false);
+  $('cLink').onclick = () => copiar(`Convite: ${S.info.titulo}\nLink: ${linkParticipantes()}` + (S.info.codigo ? `\nCódigo de acesso: ${S.info.codigo}` : ''));
+  if (S.host) $('cLink').classList.remove('oculto');
+  $('cAss').innerHTML = I.assinar + '<span>Assinar</span>';
+  $('cAss').onclick = abrirAssinatura;
+  if (S.host) document.querySelector('[data-aba="documento"]').classList.remove('oculto');
+  $('cSair').onclick = pedirSaida;
+
+  const el = document.createElement('div');
+  el.className = 'tile eu';
+  el.innerHTML = `<video autoplay playsinline muted class="espelho"></video><div class="avatar"><b>${esc(iniciais(S.nome))}</b></div>
+    <div class="rot">${I.micOff}<span>${esc(S.nome)}</span><em>você</em></div><div class="mao-tile">✋ Pediu a palavra</div>${botaoFixar(S.peer)}`;
+  el.dataset.peer = S.peer;
+  el.querySelector('video').srcObject = S.stream;
+  $('grade').appendChild(el);
+
+  atualizarControles();
+  layoutGrade();
+  mostrar('telaSala');
+  setInterval(atualizarTempo, 15000); atualizarTempo();
+}
+
+function atualizarTempo() {
+  const min = Math.floor((Date.now() - S.entrouEm) / 60000);
+  const pessoas = S.presenca.length || 1;
+  $('tempo').textContent = `${pessoas} ${pessoas === 1 ? 'pessoa' : 'pessoas'}, ${min < 1 ? 'agora há pouco' : 'há ' + min + ' min'}`;
+}
+
+function atualizarControles() {
+  botaoMicCam($('cMic'), $('cCam'));
+  const travado = !S.podeFalar && !S.mic;
+  $('cMic').classList.toggle('travado', travado);
+  if (travado) $('cMic').title = 'Microfone bloqueado pelo organizador. Levante a mão para pedir a palavra.';
+  $('cMao').classList.toggle('mao-on', S.mao);
+  $('cMao').title = S.mao ? 'Abaixar a mão' : 'Levantar a mão (pedir a palavra)';
+  const eu = document.querySelector('.tile.eu');
+  if (eu) {
+    eu.classList.toggle('mudo', !S.mic);
+    eu.classList.toggle('sem-video', !S.cam && !S.tela);
+    eu.classList.toggle('tela', !!S.tela);
+    eu.querySelector('video').classList.toggle('espelho', !S.tela);
+    eu.classList.toggle('mao', S.mao);
+  }
+  $('cTela').classList.toggle('ativo', !!S.tela);
+  $('cTela').title = S.tela ? 'Parar de apresentar' : 'Apresentar a tela';
+}
+
+function alternarMic() {
+  if (!S.temMic) return;
+  if (!S.mic && !S.podeFalar) { toast('O organizador controla os microfones. Levante a mão para pedir a palavra.'); return; }
+  definirMic(!S.mic);
+}
+function definirMic(ligar) {
+  if (!S.temMic || S.mic === ligar) return;
+  S.mic = ligar;
+  S.stream.getAudioTracks().forEach(t => t.enabled = S.mic);
+  if (S.dentro) { if (S.mic) iniciarRec(); else pararRec(); }
+  atualizarControles();
+}
+function alternarMao() {
+  S.mao = !S.mao;
+  atualizarControles();
+  toast(S.mao ? 'Mão levantada. O organizador foi avisado.' : 'Mão abaixada.');
+}
+
+/* ---------- Controle dos microfones ---------- */
+function aplicarControle(c) {
+  if (!c) return;
+  S.ctl = c;
+  if (S.host) { S.podeFalar = true; renderPessoas(); return; }
+  const antes = S.podeFalar;
+  S.podeFalar = c.modo === 'livre' || !!(c.lib && c.lib[S.peer]);
+  const ts = (c.mudo && c.mudo[S.peer]) || 0;
+  if (ts > S.ultMudo && ts > S.entrouEm) {
+    S.ultMudo = ts;
+    if (S.mic) { definirMic(false); toast('O organizador silenciou seu microfone.'); }
+  }
+  if (!S.podeFalar && S.mic) { definirMic(false); toast('O organizador controla os microfones. Use o botão da mão para pedir a palavra.'); }
+  if (S.podeFalar && !antes && c.modo === 'controlado') {
+    S.mao = false;
+    definirMic(true);
+    toast('O organizador liberou sua palavra. Seu microfone está ligado e sua fala vai para o registro.');
+  }
+  atualizarControles();
+  renderPessoas();
+}
+async function controlar(op, alvo, extra) {
+  try {
+    const r = await api(Object.assign({ action: 'controle', sala: SALA, h: CHAVE, peer: S.peer, op, alvo }, extra || {}));
+    S.ctl = r.controle; renderPessoas();
+  } catch (e) { toast(e.message); }
+}
+
+/* ---------- Painel lateral: abas ---------- */
+const mobile = () => window.matchMedia('(max-width:900px)').matches;
+function painelAberto() { return mobile() ? document.body.classList.contains('ver-registro') : !document.body.classList.contains('sem-registro'); }
+function mostrarPainel(v) {
+  if (mobile()) document.body.classList.toggle('ver-registro', v);
+  else document.body.classList.toggle('sem-registro', !v);
+  marcarBotoesPainel();
+  if (v && S.aba === 'chat') zerarNaoLidas();
+}
+function clicarAba(aba) {
+  if (painelAberto() && S.aba === aba) mostrarPainel(false);
+  else { abrirAba(aba); }
+}
+const TIT_ABA = {
+  registro: ['Registro ao vivo', 'Sua fala entra aqui enquanto o microfone estiver ligado.'],
+  chat: ['Chat', 'Perguntas e avisos por escrito. Entram no documento.'],
+  pessoas: ['Pessoas', 'Quem está na sala e quem está sendo registrado.'],
+  documento: ['Documento', 'Redija e libere a assinatura antes mesmo de encerrar.']
+};
+function abrirAba(aba) {
+  S.aba = aba;
+  document.querySelectorAll('.abas button').forEach(b => b.classList.toggle('ativo', b.dataset.aba === aba));
+  $('abaRegistro').classList.toggle('oculto', aba !== 'registro');
+  $('abaChat').classList.toggle('oculto', aba !== 'chat');
+  $('abaPessoas').classList.toggle('oculto', aba !== 'pessoas');
+  $('abaDocumento').classList.toggle('oculto', aba !== 'documento');
+  $('abaTit').textContent = TIT_ABA[aba][0]; $('abaSub').textContent = TIT_ABA[aba][1];
+  if (!painelAberto()) mostrarPainel(true); else marcarBotoesPainel();
+  if (aba === 'chat') { zerarNaoLidas(); const l = $('chatLista'); l.scrollTop = l.scrollHeight; if (!mobile()) $('chatTxt').focus(); }
+  if (aba === 'pessoas') renderPessoas();
+  if (aba === 'documento') renderDocumento();
+  if (aba === 'registro') rolarFolha(true);
+}
+function marcarBotoesPainel() {
+  const ab = painelAberto();
+  $('cChat').classList.toggle('ativo', ab && S.aba === 'chat');
+  $('cReg').classList.toggle('ativo', ab && S.aba !== 'chat');
+}
+function zerarNaoLidas() { S.naoLidas = 0; contadores(); }
+function contadores() {
+  const c = $('contChat'), p = $('pontoChat');
+  c.textContent = p.textContent = S.naoLidas > 9 ? '9+' : S.naoLidas;
+  c.classList.toggle('oculto', !S.naoLidas); p.classList.toggle('oculto', !S.naoLidas);
+  const m = $('contMao');
+  const avisos = S.maos.size + (S.host ? S.espera.length : 0);
+  m.textContent = avisos; m.classList.toggle('oculto', !S.host || !avisos);
+}
+
+/* ---------- Chat ---------- */
+function enviarChat() {
+  const t = $('chatTxt').value.trim();
+  if (!t) return;
+  $('chatTxt').value = '';
+  S.chatPend.push(t);
+  const el = document.createElement('div');
+  el.className = 'msg minha pend';
+  el.innerHTML = `<span class="quem">${esc(S.nome)}</span><span class="h">enviando…</span><p>${esc(t)}</p>`;
+  el.dataset.txt = t;
+  $('chatLista').appendChild(el);
+  $('chatVazio').classList.add('oculto');
+  $('chatLista').scrollTop = $('chatLista').scrollHeight;
+}
+function pegarChat() {
+  const out = [];
+  let total = 0;
+  while (S.chatPend.length && total < 600) { const m = S.chatPend.shift(); out.push(m); total += m.length; }
+  return out;
+}
+function adicionarChat(lista) {
+  const box = $('chatLista');
+  const perto = box.scrollHeight - box.scrollTop - box.clientHeight < 80;
+  let novasDeOutros = 0;
+  (lista || []).forEach(m => {
+    if (m.seq <= S.ultimoChat) return;
+    S.ultimoChat = m.seq;
+    const minha = m.peer === S.peer;
+    if (minha) { const p = [...box.querySelectorAll('.msg.pend')].find(x => x.dataset.txt === m.texto); if (p) p.remove(); }
+    else novasDeOutros++;
+    const el = document.createElement('div');
+    el.className = 'msg' + (minha ? ' minha' : '');
+    el.innerHTML = `<span class="quem">${esc(m.nome)}</span><span class="h">${esc(m.hora)}</span><p>${esc(m.texto)}</p>`;
+    const pend = box.querySelector('.msg.pend');
+    box.insertBefore(el, pend);
+  });
+  if ((lista || []).length) $('chatVazio').classList.add('oculto');
+  if (perto || (lista || []).some(m => m.peer === S.peer)) box.scrollTop = box.scrollHeight;
+  if (novasDeOutros && !(painelAberto() && S.aba === 'chat')) { S.naoLidas += novasDeOutros; contadores(); }
+}
+
+/* ---------- Assinatura durante a reunião ---------- */
+function aplicarAssinatura(a) {
+  if (!a) return;
+  const antes = S.assin || {};
+  S.assin = Object.assign({}, a);
+  const b = $('cAss');
+  b.classList.remove('pronto', 'feito');
+  if (a.assinada) {
+    b.disabled = false; b.classList.add('feito');
+    b.innerHTML = I.assinar + '<span>Assinado</span>'; b.title = 'Você já assinou. Clique para ver o documento.';
+  } else if (a.liberada && a.link) {
+    b.disabled = false; b.classList.add('pronto');
+    b.innerHTML = I.assinar + '<span>Assinar documento</span>'; b.title = 'O documento está liberado para sua assinatura';
+    if (!antes.liberada || !antes.link) toast('O documento está liberado. Clique em "Assinar documento".');
+  } else {
+    b.disabled = true;
+    b.innerHTML = I.assinar + '<span>Assinar</span>';
+    b.title = a.liberada ? 'Seu nome não está na lista de assinaturas. Peça ao organizador para liberar de novo.' : 'O organizador ainda não liberou a assinatura';
+  }
+  if (S.host && S.aba === 'documento') renderDocumento();
+}
+function abrirAssinatura() {
+  const a = S.assin || {};
+  if (!a.link) return;
+  window.open(a.link, '_blank', 'noopener');
+}
+async function acaoDoc(acao, btn, confirmar) {
+  if (confirmar && !confirm(confirmar)) return;
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = acao === 'docRedigir' ? 'Redigindo, até um minuto…' : acao === 'docCorrigir' ? 'Revisando…' : 'Aguarde…';
+  if (acao === 'docRedigir' && G.ligado) {
+    // fecha a parte atual da gravação para que ela entre no documento
+    btn.textContent = 'Transcrevendo a gravação…';
+    cortarSegmento();
+    await pausa(400);
+    try { await G.fila; } catch (e) {}
+    btn.textContent = 'Redigindo, até um minuto…';
+  }
+  try {
+    const r = await api({ action: acao, sala: SALA, h: CHAVE });
+    if (acao === 'docCorrigir') {
+      toast(r.corrigidos ? `${r.corrigidos} trecho(s) corrigido(s).` : 'Nenhum erro encontrado no documento.');
+      btn.disabled = false; btn.textContent = orig; return;
+    }
+    if (r.aviso) toast(r.aviso);
+    else toast(acao === 'docRedigir' ? 'Documento redigido. Revise e libere a assinatura.' : acao === 'assinLiberar' ? 'Assinaturas liberadas para todos.' : 'Assinaturas pausadas.');
+    S.assin = Object.assign({}, S.assin || {}, { doc: r.assinatura.doc, liberada: r.assinatura.liberada, docUrl: r.assinatura.docUrl, total: r.assinatura.total, assinadas: r.assinatura.assinadas });
+  } catch (e) { toast(e.message); }
+  btn.disabled = false; btn.textContent = orig;
+  renderDocumento();
+}
+function renderDocumento() {
+  const box = $('docPassos');
+  if (!box || !S.host) return;
+  const a = S.assin || {};
+  const total = a.total || 0, ok = a.assinadas || 0;
+  box.innerHTML = `
+    <div class="doc-passo ${a.doc ? 'feito' : ''}"><h3><i>${a.doc ? '✓' : '1'}</i>Redigir o documento</h3>
+      <p>${a.doc ? 'O documento foi redigido com o que foi falado até agora.' : 'A Sala transforma o registro e o chat em documento, sem encerrar a reunião.'}</p>
+      <div class="linha"><button class="btn-p ${a.doc ? '' : 'lib'}" id="dRed">${a.doc ? 'Redigir de novo' : 'Redigir agora'}</button>
+      ${a.doc && !a.liberada ? '<button class="btn-p" id="dCor">✨ Corrigir com IA</button>' : ''}
+      ${a.docUrl ? `<a href="${esc(a.docUrl)}" target="_blank" rel="noopener">Revisar no Google Docs</a>` : ''}</div></div>
+    <div class="doc-passo ${a.liberada ? 'feito' : ''}"><h3><i>${a.liberada ? '✓' : '2'}</i>Liberar a assinatura</h3>
+      <p>${a.liberada ? 'O botão de assinar está ativo para todos que entraram na reunião.' : 'O botão "Assinar" aparece para todos, mas só fica ativo quando você liberar.'}</p>
+      <div class="linha">${a.liberada
+        ? '<button class="btn-p blo" id="dPau">Pausar assinaturas</button><button class="btn-p" id="dLib">Incluir quem entrou depois</button>'
+        : `<button class="btn-p lib" id="dLib" ${a.doc ? '' : 'disabled'}>Liberar assinaturas</button>`}</div></div>
+    <div class="doc-passo ${total && ok === total ? 'feito' : ''}"><h3><i>${total && ok === total ? '✓' : '3'}</i>Acompanhar</h3>
+      ${total ? `<div class="prog"><i style="width:${Math.round(ok / total * 100)}%"></i></div><p>${ok} de ${total} ${total === 1 ? 'pessoa assinou' : 'pessoas assinaram'}. Ao assinar, cada um pode avaliar a reunião.</p>`
+        : '<p>O andamento das assinaturas aparece aqui.</p>'}</div>`;
+  const red = $('dRed'), lib = $('dLib'), pau = $('dPau');
+  if (red) red.onclick = () => acaoDoc('docRedigir', red, a.doc ? 'Redigir de novo substitui o documento e descarta as assinaturas já feitas. Continuar?' : '');
+  if (lib) lib.onclick = () => acaoDoc('assinLiberar', lib);
+  if (pau) pau.onclick = () => acaoDoc('assinPausar', pau);
+  const cor = $('dCor');
+  if (cor) cor.onclick = () => acaoDoc('docCorrigir', cor, 'A IA vai revisar ortografia, acentuação e pontuação no Google Docs, sem mudar o conteúdo. Continuar?');
+}
+
+/* ---------- Destaque e aviso de gravação (todos) ---------- */
+function aplicarVisual(c) {
+  if (!c) return;
+  const mudouFixo = (S.ctl.fixado || '') !== (c.fixado || '');
+  S.ctl = Object.assign({}, S.ctl, { fixado: c.fixado || '', gravando: !!c.gravando });
+  $('recPill').classList.toggle('oculto', !c.gravando);
+  if (mudouFixo) layoutGrade();
+}
+
+/* ---------- Sala de espera (organizador) ---------- */
+function aplicarEspera(lista) {
+  const antes = S.espera.map(x => x.id).join();
+  S.espera = lista;
+  lista.forEach(p => { if (!S.esperaVistos.has(p.id)) { S.esperaVistos.add(p.id); toast((p.nome || 'Alguém') + ' está na sala de espera.'); } });
+  const box = $('avisoEspera');
+  if (!lista.length) box.classList.add('oculto');
+  else {
+    const nomes = lista.slice(0, 2).map(p => esc(p.nome)).join(', ') + (lista.length > 2 ? ` e mais ${lista.length - 2}` : '');
+    box.innerHTML = `<span>⏳ ${lista.length === 1 ? nomes + ' está aguardando' : lista.length + ' pessoas aguardando: ' + nomes}</span>
+      ${lista.length === 1 ? `<button data-op="admitir" data-alvo="${esc(lista[0].id)}">Admitir</button>` : '<button data-op="admitirTodos">Admitir todos</button>'}
+      <button class="sec" id="bVerEspera">Ver</button>`;
+    box.classList.remove('oculto');
+    box.querySelectorAll('[data-op]').forEach(b => b.onclick = () => controlar(b.dataset.op, b.dataset.alvo || ''));
+    $('bVerEspera').onclick = () => abrirAba('pessoas');
+  }
+  if (antes !== lista.map(x => x.id).join()) { contadores(); if (S.aba === 'pessoas') renderPessoas(); }
+}
+
+/* ---------- Pessoas ---------- */
+function renderPessoas() {
+  const box = $('pessoas');
+  if (!box) return;
+  const c = S.ctl, ctrl = c.modo === 'controlado';
+  let html = '';
+  if (S.host && S.espera.length) {
+    html += `<div class="espera-box"><h3>Sala de espera (${S.espera.length})</h3>
+      ${S.espera.map(p => `<div class="pessoa" style="border:0;padding:6px 0"><span class="ini">${esc(iniciais(p.nome))}</span>
+        <span class="info"><b>${esc(p.nome)}</b><span class="selos"><span class="selo">${esc([p.cargo, p.email].filter(Boolean).join(' · ') || 'aguardando')}</span></span></span>
+        <button class="btn-p lib" data-op="admitir" data-alvo="${esc(p.id)}">Admitir</button>
+        <button class="btn-p blo" data-op="recusar" data-alvo="${esc(p.id)}">Recusar</button></div>`).join('')}
+      ${S.espera.length > 1 ? '<button class="btn-p lib cheio" data-op="admitirTodos">Admitir todos</button>' : ''}</div>`;
+  }
+  if (S.host) {
+    html += `<div class="modo"><p>${ctrl
+      ? 'Só fala quem você liberar. Quem receber a palavra tem o microfone ligado e a fala registrada.'
+      : 'Todos podem ligar o microfone. Quem fala no Chrome ou Edge entra no registro.'}</p>
+      <div class="seg"><button data-m="livre" class="${ctrl ? '' : 'ativo'}">Microfones livres</button><button data-m="controlado" class="${ctrl ? 'ativo' : ''}">Controlados por mim</button></div>
+      <button class="btn-p blo cheio" data-op="silenciarTodos">Silenciar todos</button></div>`;
+  }
+  const lista = S.presenca.length ? S.presenca : [{ id: S.peer, nome: S.nome, host: S.host, estado: { mic: S.mic, sr: !!SR } }];
+  const ord = [...lista].sort((a, b) => (b.host - a.host) || ((b.estado || {}).mao ? 1 : 0) - ((a.estado || {}).mao ? 1 : 0));
+  html += ord.map(p => {
+    const e = p.estado || {}, eu = p.id === S.peer;
+    const liberado = p.host || !ctrl || !!c.lib[p.id];
+    const selos = [];
+    if (p.host) selos.push('<span class="selo">organização</span>');
+    if (e.mao) selos.push('<span class="selo mao">✋ pediu a palavra</span>');
+    if (ctrl && !p.host) selos.push(liberado ? '<span class="selo ok">com a palavra</span>' : '<span class="selo">aguardando</span>');
+    selos.push(e.mic ? '<span class="selo ok">microfone ligado</span>' : '<span class="selo">microfone desligado</span>');
+    if (S.ctl.gravando) { if (e.mic) selos.push('<span class="selo ok">voz na gravação</span>'); }
+    else if (e.sr === false) selos.push('<span class="selo alerta">fala não registrada (navegador)</span>');
+    else if (e.mic && e.sr) selos.push('<span class="selo ok">registrando</span>');
+    let botoes = '';
+    if (S.host && !eu && !p.host) {
+      botoes += `<button class="btn-p" data-op="fixar" data-alvo="${esc(S.ctl.fixado === p.id ? '' : p.id)}">${S.ctl.fixado === p.id ? 'Desafixar' : 'Fixar'}</button>`;
+      if (ctrl) botoes += liberado
+        ? `<button class="btn-p blo" data-op="bloquear" data-alvo="${esc(p.id)}">Encerrar palavra</button>`
+        : `<button class="btn-p lib" data-op="liberar" data-alvo="${esc(p.id)}">Liberar palavra</button>`;
+      else if (e.mic) botoes += `<button class="btn-p blo" data-op="silenciar" data-alvo="${esc(p.id)}">Silenciar</button>`;
+    }
+    return `<div class="pessoa"><span class="ini">${esc(iniciais(p.nome))}</span>
+      <span class="info"><b>${esc(p.nome)}${eu ? ' (você)' : ''}</b><span class="selos">${selos.join('')}</span></span>${botoes}</div>`;
+  }).join('');
+  box.innerHTML = html;
+  box.querySelectorAll('[data-m]').forEach(b => b.onclick = () => controlar('modo', '', { modo: b.dataset.m }));
+  box.querySelectorAll('[data-op]').forEach(b => b.onclick = () => controlar(b.dataset.op, b.dataset.alvo || ''));
+}
+function verificarMaos() {
+  const agora = new Set(S.presenca.filter(p => p.id !== S.peer && (p.estado || {}).mao).map(p => p.id));
+  if (S.host) agora.forEach(id => { if (!S.maos.has(id)) { const p = S.presenca.find(x => x.id === id); toast('✋ ' + (p ? p.nome : 'Alguém') + ' pediu a palavra.'); } });
+  S.maos = agora;
+  contadores();
+}
+function alternarCam() {
+  if (!S.temCam) return;
+  S.cam = !S.cam;
+  S.stream.getVideoTracks().forEach(t => t.enabled = S.cam);
+}
+
+/* ---------- Apresentar tela ---------- */
+async function alternarTela() {
+  if (S.tela) { pararTela(); return; }
+  try { S.tela = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false }); }
+  catch (e) { return; }
+  const t = S.tela.getVideoTracks()[0];
+  t.onended = pararTela;
+  trocarVideo(t);
+  document.querySelector('.tile.eu video').srcObject = S.tela;
+  atualizarControles();
+}
+function pararTela() {
+  if (!S.tela) return;
+  S.tela.getTracks().forEach(t => t.stop());
+  S.tela = null;
+  trocarVideo(S.stream.getVideoTracks()[0] || null);
+  const v = document.querySelector('.tile.eu video');
+  if (v) v.srcObject = S.stream;
+  atualizarControles();
+}
+function videoAtual() { return S.tela ? S.tela.getVideoTracks()[0] : (S.stream.getVideoTracks()[0] || null); }
+function trocarVideo(track) {
+  for (const c of S.conns.values()) {
+    const tr = c.pc.getTransceivers().find(x => x.receiver && x.receiver.track && x.receiver.track.kind === 'video');
+    if (tr) tr.sender.replaceTrack(track).catch(() => {});
+  }
+}
+
+/* ================= Ciclo com o servidor ================= */
+async function ciclo() {
+  if (!S.dentro || S.fim) return;
+  const corpo = {
+    action: 'sync', sala: SALA, peer: S.peer, nome: S.nome, cargo: S.cargo,
+    estado: { mic: S.mic, cam: S.cam || !!S.tela, tela: !!S.tela, sr: !!SR && !S.recBloqueado, mao: S.mao },
+    sinais: [], falas: pegarFalas(), ultimaSeq: S.ultimaSeq, chat: pegarChat(), ultimoChat: S.ultimoChat
+  };
+  try {
+    const r = await api(corpo);
+    if (r.recusado) { finalizar('Você foi retirado da reunião', 'O organizador encerrou sua participação.'); return; }
+    S.falhas = 0; avisoRede('');
+    S.presenca = r.peers;
+    for (const sg of r.sinais) { try { await receberSinal(sg.from, sg.data); } catch (e) { console.warn('sinal', e); } }
+    reconciliar();
+    adicionarFalas(r.falas);
+    adicionarChat(r.chat);
+    aplicarVisual(r.controle);
+    aplicarControle(r.controle);
+    aplicarAssinatura(r.assinatura);
+    if (S.host) aplicarEspera(r.espera || []);
+    verificarMaos();
+    if (S.aba === 'pessoas') renderPessoas();
+    atualizarTempo();
+    if (ENCERRADOS.includes(r.status)) { finalizar('O organizador encerrou a reunião', 'O documento será redigido e enviado para assinatura.'); return; }
+  } catch (e) {
+    S.falasPend.unshift(...corpo.falas);
+    S.chatPend.unshift(...corpo.chat);
+    if (++S.falhas >= 3) avisoRede('Conexão instável com o servidor da Sala. Tentando de novo…');
+  }
+  setTimeout(ciclo, 1000);
+}
+
+/* ================= Vídeo entre navegadores (WebRTC) ================= */
+function novaConexao(id, ofertante) {
+  const pc = new RTCPeerConnection({ iceServers: ICE });
+  const c = { id, pc, criado: Date.now(), conectou: false, desde: 0, remoto: null };
+  const a = S.stream.getAudioTracks()[0];
+  const v = videoAtual();
+  if (a) pc.addTrack(a, S.stream); else if (ofertante) pc.addTransceiver('audio', { direction: 'recvonly' });
+  if (v) pc.addTrack(v, S.stream); else if (ofertante) pc.addTransceiver('video', { direction: 'recvonly' });
+  pc.ontrack = ev => {
+    let st = ev.streams && ev.streams[0];
+    if (!st) { c.remoto = c.remoto || new MediaStream(); c.remoto.addTrack(ev.track); st = c.remoto; }
+    c.remoto = st;
+    const el = document.querySelector(`.tile[data-id="${id}"]`);
+    if (el) { const vid = el.querySelector('video'); if (vid.srcObject !== st) { vid.srcObject = st; vid.play().catch(() => {}); } }
+    if (G.ctx) atualizarFontes();
+  };
+  pc.onconnectionstatechange = () => {
+    const s = pc.connectionState;
+    const el = document.querySelector(`.tile[data-id="${id}"]`);
+    if (s === 'connected') { c.conectou = true; c.desde = 0; if (el) el.classList.remove('aguardando'); }
+    else if (s === 'disconnected' || s === 'failed') { c.desde = c.desde || Date.now(); if (el) el.classList.add('aguardando'); }
+  };
+  return c;
+}
+function iceCompleto(pc) {
+  return new Promise(res => {
+    if (pc.iceGatheringState === 'complete') return res();
+    const t = setTimeout(res, 2500);
+    pc.addEventListener('icegatheringstatechange', () => { if (pc.iceGatheringState === 'complete') { clearTimeout(t); res(); } });
+  });
+}
+async function ligarPara(id) {
+  fechar(id);
+  const c = novaConexao(id, true);
+  S.conns.set(id, c);
+  try {
+    await c.pc.setLocalDescription(await c.pc.createOffer());
+    await iceCompleto(c.pc);
+    if (S.conns.get(id) === c) enviarSinal(id, { tipo: 'oferta', sdp: c.pc.localDescription.sdp });
+  } catch (e) { console.warn('oferta', e); }
+}
+async function receberSinal(de, data) {
+  if (!data) return;
+  if (data.tipo === 'oferta') {
+    fechar(de);
+    const c = novaConexao(de, false);
+    S.conns.set(de, c);
+    await c.pc.setRemoteDescription({ type: 'offer', sdp: data.sdp });
+    await c.pc.setLocalDescription(await c.pc.createAnswer());
+    await iceCompleto(c.pc);
+    if (S.conns.get(de) === c) enviarSinal(de, { tipo: 'resposta', sdp: c.pc.localDescription.sdp });
+  } else if (data.tipo === 'resposta') {
+    const c = S.conns.get(de);
+    if (c && c.pc.signalingState === 'have-local-offer') await c.pc.setRemoteDescription({ type: 'answer', sdp: data.sdp });
+  }
+}
+function fechar(id) {
+  const c = S.conns.get(id);
+  if (!c) return;
+  try { c.pc.close(); } catch (e) {}
+  S.conns.delete(id);
+}
+
+function reconciliar() {
+  const outros = S.presenca.filter(p => p.id !== S.peer);
+  const ids = new Set(outros.map(p => p.id));
+  for (const id of [...S.conns.keys()]) if (!ids.has(id)) fechar(id);
+  document.querySelectorAll('.tile[data-id]').forEach(el => { if (!ids.has(el.dataset.id)) el.remove(); });
+  const agora = Date.now();
+  for (const p of outros) {
+    atualizarTile(garantirTile(p), p);
+    const c = S.conns.get(p.id);
+    if (S.peer < p.id) {
+      // quem tem o identificador menor faz a chamada
+      if (!c) ligarPara(p.id);
+      else if (c.pc.connectionState === 'failed' || (!c.conectou && agora - c.criado > 20000) || (c.desde && agora - c.desde > 12000)) ligarPara(p.id);
+    } else if (c && (c.pc.connectionState === 'failed' || (c.desde && agora - c.desde > 15000))) {
+      fechar(p.id);
+    }
+  }
+  layoutGrade();
+  if (G.ctx) atualizarFontes();
+}
+function garantirTile(p) {
+  let el = document.querySelector(`.tile[data-id="${p.id}"]`);
+  if (el) return el;
+  el = document.createElement('div');
+  el.className = 'tile aguardando';
+  el.dataset.id = p.id;
+  el.innerHTML = `<video autoplay playsinline></video><div class="avatar"><b></b></div>
+    <div class="rot">${I.micOff}<span></span><em></em></div><div class="conectando">Conectando…</div><div class="mao-tile">✋ Pediu a palavra</div>${botaoFixar(p.id)}`;
+  $('grade').appendChild(el);
+  const c = S.conns.get(p.id);
+  if (c && c.remoto) el.querySelector('video').srcObject = c.remoto;
+  return el;
+}
+function atualizarTile(el, p) {
+  const e = p.estado || {};
+  el.querySelector('.rot span').textContent = p.nome;
+  el.querySelector('.rot em').textContent = p.host ? 'organização' : '';
+  el.querySelector('.avatar b').textContent = iniciais(p.nome);
+  el.classList.toggle('mudo', e.mic === false);
+  el.classList.toggle('sem-video', e.cam === false);
+  el.classList.toggle('tela', !!e.tela);
+  el.classList.toggle('mao', !!e.mao);
+}
+function botaoFixar(id) {
+  return S.host ? `<button class="fixar-btn" data-fixar="${esc(id)}" onclick="clicarFixar(this.dataset.fixar)">Fixar para todos</button>` : '';
+}
+function clicarFixar(id) { controlar('fixar', (S.ctl.fixado === id) ? '' : id); }
+function tilePorPeer(id) {
+  if (!id) return null;
+  if (id === S.peer) return document.querySelector('.tile.eu');
+  return [...document.querySelectorAll('.tile[data-id]')].find(t => t.dataset.id === id) || null;
+}
+function layoutGrade() {
+  const g = $('grade');
+  const tiles = [...g.children];
+  const n = tiles.length;
+  const alvo = tilePorPeer(S.ctl && S.ctl.fixado);
+  tiles.forEach(t => {
+    t.classList.toggle('fixo', t === alvo);
+    t.style.gridColumn = ''; t.style.gridRow = '';
+    const b = t.querySelector('.fixar-btn');
+    if (b) b.innerHTML = I.pino + (t === alvo ? 'Desafixar' : 'Fixar para todos');
+  });
+  if (alvo && n > 1) {
+    g.classList.add('destaque');
+    const outros = n - 1;
+    if (mobile()) {
+      g.style.gridTemplateColumns = `repeat(${outros}, minmax(96px, 1fr))`;
+      g.style.gridTemplateRows = 'minmax(0, 1fr) 96px';
+      alvo.style.gridColumn = '1 / -1'; alvo.style.gridRow = '1';
+      tiles.forEach(t => { if (t !== alvo) t.style.gridRow = '2'; });
+    } else {
+      g.style.gridTemplateColumns = 'minmax(0, 1fr) 230px';
+      g.style.gridTemplateRows = `repeat(${outros}, minmax(110px, 1fr))`;
+      alvo.style.gridColumn = '1'; alvo.style.gridRow = `1 / span ${outros}`;
+      tiles.forEach(t => { if (t !== alvo) t.style.gridColumn = '2'; });
+    }
+    return;
+  }
+  g.classList.remove('destaque');
+  const cols = n <= 1 ? 1 : n <= 4 ? 2 : n <= 9 ? 3 : 4;
+  g.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+  g.style.gridTemplateRows = `repeat(${Math.ceil(n / cols)}, minmax(0, 1fr))`;
+}
+
+/* ================= Gravação do áudio (só no navegador do organizador) ================= */
+// Mistura a voz de todos, grava em partes de 3 minutos e envia cada parte ao servidor,
+// junto com quem estava falando em cada momento (medido pelo volume de cada microfone).
+const G = { ctx: null, dest: null, rec: null, seg: 0, segIni: 0, ligado: false, fontes: new Map(),
+            falantes: [], atual: null, corte: null, medidor: null, fila: Promise.resolve(), pendentes: 0, semPost: false };
+const PARTE_MS = 180000;
+
+function prepararMixer() {
+  if (G.ctx) return true;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC || !window.MediaRecorder) return false;
+  G.ctx = new AC();
+  G.dest = G.ctx.createMediaStreamDestination();
+  return true;
+}
+function ligarFonte(chave, nome, track) {
+  if (!G.ctx || !track) return;
+  const f = G.fontes.get(chave);
+  if (f && f.track === track) { f.nome = nome; return; }
+  if (f) { try { f.src.disconnect(); } catch (e) {} }
+  const src = G.ctx.createMediaStreamSource(new MediaStream([track]));
+  const an = G.ctx.createAnalyser();
+  an.fftSize = 512;
+  src.connect(an); src.connect(G.dest);
+  G.fontes.set(chave, { src, an, track, nome, buf: new Float32Array(an.fftSize) });
+}
+function atualizarFontes() {
+  if (!G.ctx) return;
+  ligarFonte('eu', S.nome, S.stream.getAudioTracks()[0]);
+  const vivos = new Set(['eu']);
+  for (const [id, c] of S.conns) {
+    const t = c.remoto && c.remoto.getAudioTracks()[0];
+    const p = S.presenca.find(x => x.id === id);
+    if (t) { ligarFonte(id, p ? p.nome : 'Participante', t); vivos.add(id); }
+  }
+  for (const k of [...G.fontes.keys()]) if (!vivos.has(k)) { try { G.fontes.get(k).src.disconnect(); } catch (e) {} G.fontes.delete(k); }
+}
+function medirFalante() {
+  let melhor = null, maior = 0.018;
+  for (const f of G.fontes.values()) {
+    f.an.getFloatTimeDomainData(f.buf);
+    let soma = 0;
+    for (let i = 0; i < f.buf.length; i++) soma += f.buf[i] * f.buf[i];
+    const rms = Math.sqrt(soma / f.buf.length);
+    if (rms > maior) { maior = rms; melhor = f.nome; }
+  }
+  const t = Date.now() - G.segIni;
+  if (melhor) {
+    if (G.atual && G.atual[2] === melhor && t - G.atual[1] < 1500) G.atual[1] = t;
+    else { fecharFalante(); G.atual = [t, t, melhor]; }
+  }
+}
+function fecharFalante() {
+  if (G.atual && G.atual[1] - G.atual[0] >= 400) G.falantes.push(G.atual.slice());
+  G.atual = null;
+}
+function novoSegmento() {
+  const tipos = ['audio/webm;codecs=opus', 'audio/ogg;codecs=opus', 'audio/webm', 'audio/mp4'];
+  const mime = tipos.find(m => MediaRecorder.isTypeSupported(m)) || '';
+  const rec = new MediaRecorder(G.dest.stream, mime ? { mimeType: mime, audioBitsPerSecond: 24000 } : { audioBitsPerSecond: 24000 });
+  const pedacos = [], seg = ++G.seg, ini = Date.now(), falantes = [];
+  G.falantes = falantes; G.segIni = ini; G.atual = null;
+  rec.ondataavailable = e => { if (e.data && e.data.size) pedacos.push(e.data); };
+  rec.onstop = () => {
+    const blob = new Blob(pedacos, { type: rec.mimeType || mime || 'audio/webm' });
+    if (blob.size > 2000) enviarGravacao(seg, ini, Date.now() - ini, blob, falantes);
+  };
+  rec.start(10000);
+  G.rec = rec;
+  clearTimeout(G.corte);
+  G.corte = setTimeout(cortarSegmento, PARTE_MS);
+}
+function cortarSegmento() {
+  clearTimeout(G.corte);
+  if (!G.rec) return;
+  fecharFalante();
+  const velho = G.rec;
+  G.rec = null;
+  if (G.ligado) novoSegmento();
+  try { velho.stop(); } catch (e) {}
+}
+async function iniciarGravacao(automatico) {
+  if (!prepararMixer()) { if (!automatico) toast('Este navegador não grava áudio. Use o Chrome ou o Edge.'); return; }
+  try { await G.ctx.resume(); } catch (e) {}
+  atualizarFontes();
+  G.ligado = true;
+  novoSegmento();
+  clearInterval(G.medidor);
+  G.medidor = setInterval(medirFalante, 250);
+  $('cGrav').classList.add('gravando'); $('cGrav').title = 'Parar a gravação';
+  controlar('gravar', '', { ligar: true });
+  toast(automatico ? 'A gravação do áudio começou. Ela garante a fala de todos na ata.' : 'Gravação retomada.');
+}
+async function pararGravacao() {
+  G.ligado = false;
+  clearInterval(G.medidor);
+  cortarSegmento();
+  $('cGrav').classList.remove('gravando'); $('cGrav').title = 'Gravar o áudio da reunião';
+  controlar('gravar', '', { ligar: false });
+  await pausa(300);
+  return G.fila;
+}
+function blobParaBase64(blob) {
+  return new Promise((ok, erro) => {
+    const r = new FileReader();
+    r.onload = () => ok(String(r.result).split(',')[1] || '');
+    r.onerror = erro;
+    r.readAsDataURL(blob);
+  });
+}
+function enviarGravacao(seg, ini, dur, blob, falantes) {
+  G.pendentes++;
+  G.fila = G.fila.then(async () => {
+    const dados = { seg, mime: blob.type, t0: ini, dur, falantes, b64: await blobParaBase64(blob) };
+    for (let t = 0; t < 4; t++) {
+      try { await subirParte(dados); break; }
+      catch (e) { if (t === 3) toast('Uma parte da gravação não foi enviada: ' + e.message); else await pausa(2000 * (t + 1)); }
+    }
+  }).finally(() => { G.pendentes--; });
+  return G.fila;
+}
+async function subirParte(dados) {
+  if (!G.semPost) {
+    try {
+      const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ action: 'gravParte', sala: SALA, h: CHAVE }, dados)) });
+      const j = JSON.parse(await r.text());
+      if (!j.ok) throw new Error(j.erro || 'falha');
+      return j;
+    } catch (e) {
+      if (/falha|Failed|JSON|Unexpected/.test(e.message)) G.semPost = true; else throw e;
+    }
+  }
+  // alternativa: envia em pedaços pequenos, pelo mesmo caminho do resto da sala
+  const txt = JSON.stringify(dados), TAM = 5500, n = Math.ceil(txt.length / TAM);
+  const id = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  let r = null;
+  for (let i = 0; i < n; i += 4) {
+    const lote = [];
+    for (let k = i; k < Math.min(n, i + 4); k++) lote.push(api({ action: 'gravPedaco', sala: SALA, h: CHAVE, id, i: k, n, txt: txt.slice(k * TAM, (k + 1) * TAM) }));
+    const rs = await Promise.all(lote);
+    rs.forEach(x => { if (x && x.seg) r = x; });
+  }
+  return r;
+}
+window.addEventListener('beforeunload', ev => {
+  if (S.host && (G.pendentes > 0 || G.rec)) { ev.preventDefault(); ev.returnValue = ''; }
+});
+
+/* ================= Transcrição ================= */
+function iniciarRec() {
+  if (!SR || !S.mic || !S.dentro || S.fim || S.recAtivo || S.recBloqueado) return;
+  const rec = new SR();
+  rec.lang = 'pt-BR'; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
+  rec.onresult = ev => {
+    let parcial = '';
+    for (let i = ev.resultIndex; i < ev.results.length; i++) {
+      const r = ev.results[i];
+      if (r.isFinal) { const t = arrumar(r[0].transcript); if (t) S.falasPend.push(t); }
+      else parcial += r[0].transcript;
+    }
+    mostrarParcial(parcial);
+  };
+  rec.onerror = ev => {
+    if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') {
+      S.recBloqueado = true;
+      $('avisoSR').textContent = 'A transcrição foi bloqueada pelo navegador. Permita o microfone para esta página e recarregue.';
+      $('avisoSR').classList.remove('oculto');
+    }
+  };
+  rec.onend = () => {
+    S.recAtivo = false; mostrarParcial('');
+    if (S.mic && S.dentro && !S.fim && !S.recBloqueado) setTimeout(iniciarRec, 250);
+  };
+  try { rec.start(); S.rec = rec; S.recAtivo = true; } catch (e) { S.recAtivo = false; }
+}
+function pararRec() { if (S.rec) { try { S.rec.stop(); } catch (e) {} } }
+function arrumar(t) {
+  t = String(t || '').trim();
+  if (!t) return '';
+  t = t.charAt(0).toUpperCase() + t.slice(1);
+  if (!/[.!?…]$/.test(t)) t += '.';
+  return t;
+}
+function mostrarParcial(t) {
+  const el = $('interim');
+  el.textContent = t ? S.nome.split(' ')[0] + ': ' + t : '';
+  if (t) rolarFolha(true);
+}
+function adicionarFalas(lista) {
+  const folha = $('folha'), parcial = $('interim');
+  const perto = folha.scrollHeight - folha.scrollTop - folha.clientHeight < 80;
+  let novas = 0;
+  (lista || []).forEach(f => {
+    if (f.seq <= S.ultimaSeq) return;
+    S.ultimaSeq = f.seq;
+    const p = document.createElement('p');
+    p.className = 'fala' + (f.peer === S.peer ? ' minha' : '');
+    p.innerHTML = `<span class="h">${esc(f.hora)}</span><b>${esc(f.nome)}:</b> ${esc(f.texto)}`;
+    folha.insertBefore(p, parcial);
+    novas++;
+  });
+  if (novas) { $('folhaVazia').classList.add('oculto'); rolarFolha(perto); }
+}
+function rolarFolha(forcar) { const f = $('folha'); if (forcar) f.scrollTop = f.scrollHeight; }
+
+/* ================= Sair ================= */
+function pedirSaida() {
+  if (!S.host) { finalizar('Você saiu da reunião', 'Pode fechar esta aba.'); return; }
+  $('modal').innerHTML = `<div class="fundo" onclick="if(event.target===this)this.parentNode.innerHTML=''">
+    <div class="caixa"><h2>Sair da reunião</h2><p>Encerrar para todos fecha a sala e libera o registro para virar documento.</p>
+    <div class="acoes"><button class="btn perigo" id="mEnc">Encerrar para todos</button>
+    <button class="btn sec" id="mSair">Só sair</button>
+    <button class="btn sec" onclick="document.getElementById('modal').innerHTML=''">Continuar na reunião</button></div></div></div>`;
+  $('mSair').onclick = () => { $('modal').innerHTML = ''; finalizar('Você saiu da reunião', 'A reunião continua para os outros participantes.'); };
+  $('mEnc').onclick = async () => {
+    const b = $('mEnc'); b.disabled = true; b.textContent = 'Encerrando…';
+    try { await api({ action: 'encerrar', sala: SALA, h: CHAVE }); }
+    catch (e) { b.disabled = false; b.textContent = 'Encerrar para todos'; toast(e.message); return; }
+    $('modal').innerHTML = '';
+    finalizar('Reunião encerrada', 'Volte ao painel da Sala para redigir o documento.');
+  };
+}
+function avisarSaida() {
+  if (!S.peer) return;
+  try { api({ action: 'sair', sala: SALA, peer: S.peer }, { keepalive: true }).catch(() => {}); } catch (e) {}
+}
+async function finalizar(tit, msg) {
+  if (S.fim) return;
+  // envia as últimas falas antes de sair
+  if ((S.falasPend.length || S.chatPend.length) && S.dentro) {
+    while (S.falasPend.length || S.chatPend.length) { try { await api({ action: 'sync', sala: SALA, peer: S.peer, nome: S.nome, sinais: [], falas: pegarFalas(), chat: pegarChat(), ultimaSeq: S.ultimaSeq, ultimoChat: S.ultimoChat, estado: {} }); } catch (e) { break; } }
+  }
+  if (S.host && (G.ligado || G.pendentes)) {
+    telaEstado('Salvando a gravação…', 'Não feche esta aba. Isso leva alguns segundos.', '<div class="giro" aria-hidden="true"></div>');
+    try { if (G.ligado) await pararGravacao(); await G.fila; } catch (e) {}
+  }
+  S.fim = true; S.dentro = false;
+  pararRec(); avisarSaida();
+  for (const id of [...S.conns.keys()]) fechar(id);
+  if (S.tela) S.tela.getTracks().forEach(t => t.stop());
+  S.stream.getTracks().forEach(t => t.stop());
+  avisoRede('');
+  $('avisoEspera').classList.add('oculto');
+  try { if (G.ctx) G.ctx.close(); } catch (e) {}
+  telaEstado(tit, msg, S.host ? '' : '<div id="ctaSala"></div>');
+  if (!S.host) montarCta();
+}
+
+/* ---------- Convite final: crie sua sala ---------- */
+const LOGO_G = '<svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.9 3.6-4.9 6.7-4.9z"/></svg>';
+const LOGO_M = '<svg viewBox="0 0 24 24"><path fill="#F25022" d="M1 1h10.5v10.5H1z"/><path fill="#7FBA00" d="M12.5 1H23v10.5H12.5z"/><path fill="#00A4EF" d="M1 12.5h10.5V23H1z"/><path fill="#FFB900" d="M12.5 12.5H23V23H12.5z"/></svg>';
+async function montarCta() {
+  const box = $('ctaSala');
+  if (!box) return;
+  box.className = 'cta';
+  box.innerHTML = `<h2>Crie sua sala</h2><p>Reuniões que terminam com a ata pronta e assinada. É só entrar com seu Gmail ou Outlook.</p>
+    <div class="est-acoes"><button class="btn" id="bCriar">Criar minha sala</button></div>`;
+  $('bCriar').onclick = async () => {
+    const b = $('bCriar'); b.disabled = true; b.textContent = 'Carregando…';
+    let cfg = { google: '', microsoft: '' };
+    try { cfg = await api({ action: 'loginCfg' }); } catch (e) {}
+    const pagina = location.origin + location.pathname.replace(/[^/]*$/, '') + 'entrar.html';
+    const opcoes = (cfg.google ? `<a class="btn prov" href="${pagina}?p=google">${LOGO_G}Entrar com Gmail (Google)</a>` : '') +
+                   (cfg.microsoft ? `<a class="btn prov" href="${pagina}?p=microsoft">${LOGO_M}Entrar com Outlook (Microsoft)</a>` : '');
+    box.querySelector('.est-acoes').innerHTML = opcoes || `<a class="btn" href="${API_URL}">Entrar na Sala</a>`;
+  };
+}
+window.addEventListener('pagehide', () => { if (S.dentro) avisarSaida(); });
+</script>
+</body>
+</html>
