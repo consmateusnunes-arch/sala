@@ -198,6 +198,7 @@ body.sem-registro .registro{display:none}
 .rec-pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#FF5A4E;animation:pisca 1.4s ease-in-out infinite}
 @keyframes pisca{50%{opacity:.25}}
 .ctl.gravando{background:var(--lacre);color:#fff}
+.ctl.desativado{opacity:.4}
 .aviso-espera{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);z-index:45;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
   background:#F2C46D;color:#2E2205;font-weight:600;font-size:14px;padding:10px 14px;border-radius:12px;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);max-width:calc(100vw - 24px)}
 .aviso-espera button{border:0;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer;background:#2E2205;color:#F2C46D}
@@ -260,6 +261,31 @@ body.sem-registro .registro{display:none}
   .dupla{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Bichinhos (imagem com a câmera desligada) */
+.tile .avatar img{width:min(62%,220px);aspect-ratio:1;object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.35))}
+.tile .avatar.com-bicho b{display:none}
+.tile .avatar:not(.com-bicho) img{display:none}
+.pessoa .ini.bicho{background:#F1F4FB;padding:2px}
+.pessoa .ini.bicho img{width:100%;height:100%;object-fit:contain}
+.previa .sem-cam{gap:6px;align-content:center;justify-items:center}
+.previa .sem-cam img{width:min(42%,170px);aspect-ratio:1;object-fit:contain}
+.bichos{border:0;margin:0 0 14px;padding:0}
+.bichos legend{font-size:13px;font-weight:600;color:var(--suave,#5B6270);margin-bottom:6px;padding:0}
+.bichos .grade-bichos{display:grid;grid-template-columns:repeat(9,1fr);gap:6px}
+.bichos label{position:relative;cursor:pointer;border-radius:12px;background:#F1F4FB;border:2px solid transparent;aspect-ratio:1;display:grid;place-items:center;transition:transform .15s,border-color .15s}
+.bichos label:hover{transform:translateY(-2px)}
+.bichos input{position:absolute;opacity:0;pointer-events:none}
+.bichos img{width:88%;height:88%;object-fit:contain}
+.bichos label:has(input:checked){border-color:var(--tinta);background:#E3EBFF;box-shadow:0 0 0 3px rgba(28,63,170,.15)}
+.bichos label:has(input:focus-visible){outline:2px solid var(--tinta);outline-offset:2px}
+@media (max-width:560px){.bichos .grade-bichos{grid-template-columns:repeat(5,1fr)}}
+/* Contagem "Reunião iniciando em 3, 2, 1" */
+.contagem{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(10,20,55,.72);backdrop-filter:blur(4px);color:#fff;text-align:center}
+.contagem p{margin:0;font-size:clamp(18px,3vw,26px);font-weight:600;letter-spacing:.02em}
+.contagem b{display:block;font-family:'Source Serif 4',Georgia,serif;font-size:clamp(110px,22vw,200px);line-height:1;margin-top:10px;animation:pulsoNum 1s ease-out both}
+.contagem b.vai{font-size:clamp(54px,9vw,90px);color:#7BE0B0}
+@keyframes pulsoNum{0%{transform:scale(1.6);opacity:0}25%{transform:scale(1);opacity:1}85%{opacity:1}100%{opacity:.15;transform:scale(.9)}}
+@media (prefers-reduced-motion:reduce){.contagem b{animation:none}}
 </style>
 </head>
 <body>
@@ -273,7 +299,7 @@ body.sem-registro .registro{display:none}
     <div class="previa">
       <video id="previa" autoplay playsinline muted></video>
       <div class="pedir" id="pedirMidia"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10.5l5-3v9l-5-3"/></svg>Câmera e microfone ficam desligados até você autorizar ao lado.</div></div>
-      <div class="sem-cam oculto" id="semCamPre">Câmera desligada</div>
+      <div class="sem-cam oculto" id="semCamPre"><img id="bichoPre" alt=""><span>Câmera desligada</span></div>
       <div class="botoes">
         <button class="ctl" id="pMic" title="Ligar ou desligar microfone"></button>
         <button class="ctl" id="pCam" title="Ligar ou desligar câmera"></button>
@@ -294,6 +320,7 @@ body.sem-registro .registro{display:none}
       </div>
       <label class="campo"><span>Celular com WhatsApp (opcional)</span><input id="iTel" type="tel" maxlength="20" autocomplete="tel" placeholder="(00) 00000-0000"></label>
       <label class="campo campo-cod oculto" id="campoCodigo"><span>Código de acesso</span><input id="iCodigo" maxlength="12" autocomplete="off" placeholder="Enviado pelo organizador"></label>
+      <fieldset class="bichos" id="bichos"><legend>Escolha sua imagem para quando a câmera estiver desligada</legend><div class="grade-bichos" id="gradeBichos"></div></fieldset>
       <label class="consent" id="caixaConsent"><input type="checkbox" id="iConsent">
         <span>Autorizo a Sala a captar minha <b>voz</b> e minha <b>imagem</b> durante esta reunião, para transmitir aos participantes, <b>gravar o áudio</b> e redigir a ata. Posso desligar câmera e microfone a qualquer momento.</span></label>
       <button class="btn cheio" id="bEntrar" type="submit" disabled>Entrar na reunião</button>
@@ -303,12 +330,14 @@ body.sem-registro .registro{display:none}
   </div>
 </div>
 
+<div class="contagem oculto" id="contagem" role="status" aria-live="assertive"><div><p>Reunião iniciando em</p><b id="contNum">3</b></div></div>
+
 <!-- Reunião -->
 <div id="telaSala" class="sala oculto">
   <div class="topo">
     <span class="marca"><img src="logo-mini.png" alt="" style="height:26px;vertical-align:-6px;margin-right:6px">Sala</span>
     <span class="tit" id="salaTit"></span>
-    <button class="btn-iniciar oculto" id="bIniciar" title="Começa a registrar as falas e a gravar o áudio para a ata">▶ Iniciar reunião</button>
+    <button class="btn-iniciar oculto" id="bIniciar" title="Começa a registrar as falas para a ata. A gravação do áudio é separada, no botão de gravar.">▶ Iniciar reunião</button>
     <span class="pill-aguarda oculto" id="pillAguarda" title="Testes de som e imagem não vão para a ata">Aguardando início</span>
     <span class="rec-pill oculto" id="recPill" title="O áudio desta reunião está sendo gravado para a ata">Gravando</span>
     <span class="tempo" id="tempo"></span>
@@ -400,6 +429,23 @@ const I = {
 
 /* ================= Utilidades ================= */
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+const BICHOS = ['Leão', 'Pinguim', 'Gato', 'Panda', 'Girafa', 'Tartaruga', 'Raposa', 'Coruja', 'Coelho'];
+function bichoValido(n) { n = Number(n); return n >= 1 && n <= BICHOS.length && Math.floor(n) === n ? n : 0; }
+function bichoSrc(n) { return 'avatar-' + n + '.png'; }
+function montarBichos(salvo) {
+  S.av = bichoValido(salvo) || (1 + Math.floor(Math.random() * BICHOS.length));
+  $('gradeBichos').innerHTML = BICHOS.map((nome, k) => `<label title="${nome}"><input type="radio" name="bicho" value="${k + 1}"${k + 1 === S.av ? ' checked' : ''}><img src="${bichoSrc(k + 1)}" alt="${nome}"></label>`).join('');
+  $('gradeBichos').onchange = ev => { S.av = bichoValido(ev.target.value) || S.av; atualizarBotoesPre(); };
+}
+function pintarAvatar(el, nome, av) {
+  const box = el.querySelector('.avatar'); if (!box) return;
+  av = bichoValido(av);
+  box.classList.toggle('com-bicho', !!av);
+  let img = box.querySelector('img');
+  if (!img) { img = document.createElement('img'); img.alt = ''; box.appendChild(img); }
+  if (av && img.dataset.av !== String(av)) { img.src = bichoSrc(av); img.dataset.av = av; }
+  box.querySelector('b').textContent = iniciais(nome);
+}
 function iniciais(n) { return String(n || '?').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0]).join('').toUpperCase(); }
 function tipoLabel(t) { return ({ 'Ata': 'Ata', 'Relatório': 'Relatório', 'Reunião': 'Resumo de reunião' })[t] || t; }
 async function api(corpo, opcoes) {
@@ -472,7 +518,9 @@ function montarPre() {
   try {
     const p = JSON.parse(localStorage.getItem('sala_eu') || '{}');
     $('iNome').value = p.nome || ''; $('iEmail').value = p.email || ''; $('iCargo').value = p.cargo || ''; $('iTel').value = p.tel || '';
+    S.avSalvo = p.av;
   } catch (e) {}
+  montarBichos(S.avSalvo);
   const mv = modoVoz();
   if (mv === 'sem') { $('notaSR').textContent = 'Este navegador não consegue registrar sua fala. Você pode participar pelo chat.'; $('notaSR').classList.add('alerta'); }
   else if (mv === 'ia') $('notaSR').textContent = 'Neste aparelho, sua fala é escrita pela IA alguns segundos depois que você fala. Use fone de ouvido, se puder.';
@@ -529,6 +577,7 @@ function fecharMidia() {
 function atualizarBotoesPre() {
   botaoMicCam($('pMic'), $('pCam'));
   $('semCamPre').classList.toggle('oculto', S.cam || !S.midiaAberta);
+  if (S.av) { $('bichoPre').src = bichoSrc(S.av); $('bichoPre').alt = BICHOS[S.av - 1]; }
   $('previa').style.visibility = S.cam ? 'visible' : 'hidden';
 }
 function botaoMicCam(bMic, bCam) {
@@ -553,7 +602,7 @@ async function entrar(ev) {
   if (!$('iConsent').checked) { $('erroEntrar').textContent = 'Para entrar, marque a autorização de voz e imagem.'; return; }
   if (S.info.precisaCodigo && !$('iCodigo').value.trim()) { $('erroEntrar').textContent = 'Digite o código de acesso que o organizador enviou.'; $('iCodigo').focus(); return; }
   S.tel = $('iTel').value.trim();
-  try { localStorage.setItem('sala_eu', JSON.stringify({ nome: S.nome, email: S.email, cargo: S.cargo, tel: S.tel })); } catch (e) {}
+  try { localStorage.setItem('sala_eu', JSON.stringify({ nome: S.nome, email: S.email, cargo: S.cargo, tel: S.tel, av: S.av })); } catch (e) {}
   const b = $('bEntrar'); b.disabled = true; b.textContent = 'Entrando…';
   try {
     const r = await api({ action: 'entrar', sala: SALA, h: CHAVE, nome: S.nome, email: S.email, cargo: S.cargo,
@@ -610,9 +659,10 @@ function montarSala() {
   $('cGrav').innerHTML = I.grav;
   if (S.host && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext)) {
     $('cGrav').classList.remove('oculto');
+    $('cGrav').classList.add('desativado');
     $('cGrav').onclick = () => {
-      if (!S.ctl.iniciada) { toast('A gravação começa quando você clicar em "Iniciar reunião".'); return; }
-      if (G.ligado) { G.pausadoManual = true; pararGravacao(); } else { G.pausadoManual = false; iniciarGravacao(false); }
+      if (!S.ctl.iniciada) { toast('Primeiro clique em "Iniciar reunião". Depois disso, o botão de gravar fica disponível.'); return; }
+      if (G.ligado) pararGravacao(); else iniciarGravacao();
     };
   }
   $('cTela').innerHTML = I.tela; $('cReg').innerHTML = I.reg; $('cLink').innerHTML = I.link; $('cSair').innerHTML = I.sair;
@@ -623,11 +673,15 @@ function montarSala() {
   if (S.host) {
     $('bIniciar').classList.remove('oculto');
     $('bIniciar').onclick = async () => {
-      const b = $('bIniciar'); b.disabled = true; b.textContent = 'Iniciando…';
+      const b = $('bIniciar'); if (b.disabled) return;
+      b.disabled = true; b.textContent = 'Iniciando…';
+      S.contando = true;                       // os participantes veem a contagem pelo próximo ciclo
+      await contagemRegressiva();
       await controlar('iniciar', '');
+      S.contando = false;
       b.disabled = false; b.textContent = '▶ Iniciar reunião';
     };
-    setTimeout(() => { if (!S.ctl.iniciada) toast('Faça os testes de som e imagem. Quando estiver pronto, clique em "Iniciar reunião".'); }, 1500);
+    setTimeout(() => { if (!S.ctl.iniciada) toast('Faça os testes de som e imagem. Quando estiver pronto, clique em "Iniciar reunião". A gravação só começa se você apertar o botão de gravar.'); }, 1500);
   } else $('pillAguarda').classList.remove('oculto');
   if (!S.host) $('cMao').classList.remove('oculto');
   if (window.matchMedia('(max-width:900px)').matches) $('cReg').classList.remove('ativo');
@@ -654,6 +708,7 @@ function montarSala() {
   el.innerHTML = `<video autoplay playsinline muted class="espelho"></video><div class="avatar"><b>${esc(iniciais(S.nome))}</b></div>
     <div class="rot">${I.micOff}<span>${esc(S.nome)}</span><em>você</em></div><div class="mao-tile">✋ Pediu a palavra</div>${botaoFixar(S.peer)}`;
   el.dataset.peer = S.peer;
+  pintarAvatar(el, S.nome, S.av);
   el.querySelector('video').srcObject = S.stream;
   $('grade').appendChild(el);
 
@@ -905,12 +960,46 @@ function aplicarVisual(c) {
   $('recPill').classList.toggle('oculto', !c.gravando);
   $('bIniciar').classList.toggle('oculto', !S.host || !!c.iniciada);
   $('pillAguarda').classList.toggle('oculto', S.host || !!c.iniciada);
+  if (S.host) {
+    $('cGrav').classList.toggle('desativado', !c.iniciada);
+    $('cGrav').title = !c.iniciada ? 'A gravação fica disponível depois de "Iniciar reunião"' : (G.ligado ? 'Parar a gravação' : 'Gravar o áudio da reunião');
+    // o organizador recarregou a página: a gravação anterior parou, então o aviso "Gravando" também sai
+    if (c.gravando && !G.ligado && !G.avisoReinicio) {
+      G.avisoReinicio = true;
+      controlar('gravar', '', { ligar: false });
+      toast('A gravação parou quando você saiu da sala. Clique no botão de gravar para retomar.');
+    }
+  }
   if (comecou) {
-    toast(S.host ? 'Reunião iniciada: a partir de agora as falas e o áudio vão para a ata.' : 'A reunião começou. A partir de agora as falas vão para a ata.');
+    toast(S.host ? 'Reunião iniciada: as falas já vão para a ata. Para gravar o áudio, clique no botão de gravar (●).' : 'A reunião começou. A partir de agora as falas vão para a ata.');
     iniciarRec();
-    if (S.host && !G.ligado && !G.pausadoManual) iniciarGravacao(true);
   }
   if (mudouFixo) layoutGrade();
+}
+
+/* ---------- Contagem "Reunião iniciando em 3, 2, 1" ---------- */
+function contagemRegressiva() {
+  if (S.contagemAtiva) return S.contagemAtiva;
+  const box = $('contagem'), num = $('contNum');
+  const passo = (t, cls) => { num.className = cls || ''; num.textContent = t; void num.offsetWidth; num.style.animation = 'none'; void num.offsetWidth; num.style.animation = ''; };
+  S.contagemAtiva = new Promise(ok => {
+    box.classList.remove('oculto');
+    let n = 3; passo(n);
+    const t = setInterval(() => {
+      n--;
+      if (n > 0) { passo(n); return; }
+      clearInterval(t);
+      box.querySelector('p').textContent = 'Reunião';
+      passo('iniciada!', 'vai');
+      setTimeout(() => { box.classList.add('oculto'); box.querySelector('p').textContent = 'Reunião iniciando em'; S.contagemAtiva = null; ok(); }, 900);
+    }, 1000);
+  });
+  return S.contagemAtiva;
+}
+function verificarContagem() {
+  if (S.host || S.ctl.iniciada || S.contagemVista) return;
+  const org = (S.presenca || []).find(p => p.host && p.estado && p.estado.cont);
+  if (org) { S.contagemVista = true; contagemRegressiva(); }
 }
 
 /* ---------- Sala de espera (organizador) ---------- */
@@ -972,7 +1061,9 @@ function renderPessoas() {
         ? `<button class="btn-p lib" data-op="desbloquear" data-alvo="${esc(p.id)}">Desbloquear</button>`
         : `<button class="btn-p blo" data-op="bloquear" data-alvo="${esc(p.id)}">Bloquear</button>`;
     }
-    return `<div class="pessoa"><span class="ini">${esc(iniciais(p.nome))}</span>
+    const av = bichoValido(eu ? S.av : e.av);
+    const ini = av ? `<span class="ini bicho"><img src="${bichoSrc(av)}" alt=""></span>` : `<span class="ini">${esc(iniciais(p.nome))}</span>`;
+    return `<div class="pessoa">${ini}
       <span class="info"><b>${esc(p.nome)}${eu ? ' (você)' : ''}</b><span class="selos">${selos.join('')}</span></span>${botoes}</div>`;
   }).join('');
   box.innerHTML = html;
@@ -1023,7 +1114,7 @@ async function ciclo() {
   if (!S.dentro || S.fim) return;
   const corpo = {
     action: 'sync', sala: SALA, peer: S.peer, nome: S.nome, cargo: S.cargo,
-    estado: { mic: S.mic, cam: S.cam || !!S.tela, tela: !!S.tela, voz: modoVoz(), mao: S.mao },
+    estado: { mic: S.mic, cam: S.cam || !!S.tela, tela: !!S.tela, voz: modoVoz(), mao: S.mao, av: S.av || 0, cont: !!S.contando },
     sinais: [], falas: pegarFalas(), ultimaSeq: S.ultimaSeq, chat: pegarChat(), ultimoChat: S.ultimoChat
   };
   try {
@@ -1040,6 +1131,7 @@ async function ciclo() {
     aplicarAssinatura(r.assinatura);
     if (S.host) aplicarEspera(r.espera || []);
     verificarMaos();
+    verificarContagem();
     if (S.aba === 'pessoas') renderPessoas();
     atualizarTempo();
     if (ENCERRADOS.includes(r.status)) { finalizar('O organizador encerrou a reunião', 'O documento será redigido e enviado para assinatura.'); return; }
@@ -1151,7 +1243,7 @@ function atualizarTile(el, p) {
   const e = p.estado || {};
   el.querySelector('.rot span').textContent = p.nome;
   el.querySelector('.rot em').textContent = p.host ? 'organização' : '';
-  el.querySelector('.avatar b').textContent = iniciais(p.nome);
+  pintarAvatar(el, p.nome, e.av);
   el.classList.toggle('mudo', e.mic === false);
   el.classList.toggle('sem-video', e.cam === false);
   el.classList.toggle('tela', !!e.tela);
@@ -1290,7 +1382,7 @@ async function iniciarGravacao(automatico) {
   G.medidor = setInterval(medirFalante, 250);
   $('cGrav').classList.add('gravando'); $('cGrav').title = 'Parar a gravação';
   controlar('gravar', '', { ligar: true });
-  toast(automatico ? 'A gravação do áudio começou. Ela garante a fala de todos na ata.' : 'Gravação retomada.');
+  toast(G.seg > 1 ? 'Gravação retomada.' : 'Gravação iniciada. Todos veem o aviso "Gravando" no topo.');
 }
 async function pararGravacao() {
   G.ligado = false;
