@@ -174,6 +174,26 @@ body.sem-registro .registro{display:none}
 .btn.prov:hover{background:#EEF2F8}
 .btn.prov svg{width:18px;height:18px}
 /* Gravação, espera do organizador e destaque */
+.btn-iniciar{border:0;border-radius:999px;padding:8px 16px;font-weight:700;font-size:14px;cursor:pointer;background:#2F9E6E;color:#fff;white-space:nowrap;
+  box-shadow:0 0 0 0 rgba(62,156,114,.6);animation:chamar 2s ease-in-out infinite}
+.btn-iniciar:hover{background:#278A5F}
+.btn-iniciar:disabled{opacity:.6;animation:none}
+.pill-aguarda{display:inline-flex;align-items:center;gap:6px;background:#3A3220;color:#F2C46D;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.linha-bt{display:flex;gap:6px}
+.linha-bt .btn-p{flex:1}
+.selo.blq{background:#FBE7E5;color:#B3261E}
+@media (max-width:900px){.btn-iniciar{padding:7px 12px;font-size:13px}.pill-aguarda{font-size:11.5px}}
+@media (max-width:600px){
+  .controles{justify-content:flex-start;gap:6px;padding:0 10px;overflow-x:auto;scrollbar-width:none}
+  .controles::-webkit-scrollbar{display:none}
+  .controles .ctl{width:42px;height:42px;flex:none}
+  .controles .ctl.sair{width:54px}
+  .controles .ctl.assinar{padding:0 12px}
+  .topo{gap:8px}
+  .topo .marca{font-size:18px}
+  .topo .tit{font-size:13px}
+  .topo .tempo{display:none}
+}
 .rec-pill{display:inline-flex;align-items:center;gap:6px;background:#3A1F22;color:#FF9A92;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:999px;white-space:nowrap}
 .rec-pill::before{content:"";width:8px;height:8px;border-radius:50%;background:#FF5A4E;animation:pisca 1.4s ease-in-out infinite}
 @keyframes pisca{50%{opacity:.25}}
@@ -288,6 +308,8 @@ body.sem-registro .registro{display:none}
   <div class="topo">
     <span class="marca"><img src="logo-mini.png" alt="" style="height:26px;vertical-align:-6px;margin-right:6px">Sala</span>
     <span class="tit" id="salaTit"></span>
+    <button class="btn-iniciar oculto" id="bIniciar" title="Começa a registrar as falas e a gravar o áudio para a ata">▶ Iniciar reunião</button>
+    <span class="pill-aguarda oculto" id="pillAguarda" title="Testes de som e imagem não vão para a ata">Aguardando início</span>
     <span class="rec-pill oculto" id="recPill" title="O áudio desta reunião está sendo gravado para a ata">Gravando</span>
     <span class="tempo" id="tempo"></span>
   </div>
@@ -352,7 +374,7 @@ const S = {
   stream: new MediaStream(), tela: null, mic: false, cam: false, temMic: false, temCam: false,
   ultimaSeq: 0, saida: [], falasPend: [], presenca: [], conns: new Map(),
   ultimoChat: 0, chatPend: [], chatEnviando: [], naoLidas: 0, aba: 'registro',
-  ctl: { modo: 'livre', lib: {}, mudo: {} }, podeFalar: true, mao: false, ultMudo: 0, maos: new Set(),
+  ctl: { todos: false, bloq: {}, lib: {}, iniciada: 0 }, podeFalar: true, mao: false, ultMudo: 0, maos: new Set(),
   dentro: false, fim: false, falhas: 0, entrouEm: 0,
   rec: null, recAtivo: false, recBloqueado: false,
   espera: [], esperaVistos: new Set(), aguardando: false, midiaAberta: false
@@ -451,7 +473,9 @@ function montarPre() {
     const p = JSON.parse(localStorage.getItem('sala_eu') || '{}');
     $('iNome').value = p.nome || ''; $('iEmail').value = p.email || ''; $('iCargo').value = p.cargo || ''; $('iTel').value = p.tel || '';
   } catch (e) {}
-  if (!SR) { $('notaSR').textContent = 'Seu navegador não transcreve fala. Use Chrome ou Edge no computador para que suas falas entrem no documento.'; $('notaSR').classList.add('alerta'); }
+  const mv = modoVoz();
+  if (mv === 'sem') { $('notaSR').textContent = 'Este navegador não consegue registrar sua fala. Você pode participar pelo chat.'; $('notaSR').classList.add('alerta'); }
+  else if (mv === 'ia') $('notaSR').textContent = 'Neste aparelho, sua fala é escrita pela IA alguns segundos depois que você fala. Use fone de ouvido, se puder.';
   else $('notaSR').textContent = 'Use fone de ouvido: assim a transcrição registra só a sua voz.';
   $('iConsent').onchange = async () => {
     const ok = $('iConsent').checked;
@@ -521,6 +545,7 @@ function botaoMicCam(bMic, bCam) {
 /* ================= Entrar ================= */
 async function entrar(ev) {
   ev.preventDefault();
+  prepararVozCtx();
   $('erroEntrar').textContent = '';
   S.nome = $('iNome').value.trim(); S.email = $('iEmail').value.trim(); S.cargo = $('iCargo').value.trim();
   if (S.nome.length < 3) { $('erroEntrar').textContent = 'Digite seu nome completo. Ele vai aparecer no documento.'; return; }
@@ -546,9 +571,7 @@ async function entrar(ev) {
 function entrarNaSala() {
   S.dentro = true; S.entrouEm = Date.now();
   montarSala();
-  iniciarRec();
   ciclo();
-  if (S.host) iniciarGravacao(true);
 }
 const pausa = ms => new Promise(r => setTimeout(r, ms));
 
@@ -587,13 +610,25 @@ function montarSala() {
   $('cGrav').innerHTML = I.grav;
   if (S.host && window.MediaRecorder && (window.AudioContext || window.webkitAudioContext)) {
     $('cGrav').classList.remove('oculto');
-    $('cGrav').onclick = () => { if (G.ligado) pararGravacao(); else iniciarGravacao(false); };
+    $('cGrav').onclick = () => {
+      if (!S.ctl.iniciada) { toast('A gravação começa quando você clicar em "Iniciar reunião".'); return; }
+      if (G.ligado) { G.pausadoManual = true; pararGravacao(); } else { G.pausadoManual = false; iniciarGravacao(false); }
+    };
   }
   $('cTela').innerHTML = I.tela; $('cReg').innerHTML = I.reg; $('cLink').innerHTML = I.link; $('cSair').innerHTML = I.sair;
   $('cMao').innerHTML = I.mao; $('cChat').innerHTML = I.chat + '<span class="ponto oculto" id="pontoChat"></span>';
   $('fecharReg').innerHTML = I.x;
   if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia || !S.temCam) $('cTela').classList.add('oculto');
-  if (!SR) $('avisoSR').classList.remove('oculto');
+  if (modoVoz() === 'sem') $('avisoSR').classList.remove('oculto');
+  if (S.host) {
+    $('bIniciar').classList.remove('oculto');
+    $('bIniciar').onclick = async () => {
+      const b = $('bIniciar'); b.disabled = true; b.textContent = 'Iniciando…';
+      await controlar('iniciar', '');
+      b.disabled = false; b.textContent = '▶ Iniciar reunião';
+    };
+    setTimeout(() => { if (!S.ctl.iniciada) toast('Faça os testes de som e imagem. Quando estiver pronto, clique em "Iniciar reunião".'); }, 1500);
+  } else $('pillAguarda').classList.remove('oculto');
   if (!S.host) $('cMao').classList.remove('oculto');
   if (window.matchMedia('(max-width:900px)').matches) $('cReg').classList.remove('ativo');
   $('cMao').onclick = alternarMao;
@@ -655,7 +690,7 @@ function atualizarControles() {
 
 function alternarMic() {
   if (!S.temMic) return;
-  if (!S.mic && !S.podeFalar) { toast('O organizador controla os microfones. Levante a mão para pedir a palavra.'); return; }
+  if (!S.mic && !S.podeFalar) { toast('Seu microfone está bloqueado pelo organizador. Levante a mão para pedir a palavra.'); return; }
   definirMic(!S.mic);
 }
 function definirMic(ligar) {
@@ -672,30 +707,24 @@ function alternarMao() {
 }
 
 /* ---------- Controle dos microfones ---------- */
+function micBloqueado(c, id) { return !!(c.bloq && c.bloq[id]) || (!!c.todos && !(c.lib && c.lib[id])); }
 function aplicarControle(c) {
   if (!c) return;
-  S.ctl = c;
+  S.ctl = Object.assign({}, S.ctl, c);
   if (S.host) { S.podeFalar = true; renderPessoas(); return; }
   const antes = S.podeFalar;
-  S.podeFalar = c.modo === 'livre' || !!(c.lib && c.lib[S.peer]);
-  const ts = (c.mudo && c.mudo[S.peer]) || 0;
-  if (ts > S.ultMudo && ts > S.entrouEm) {
-    S.ultMudo = ts;
-    if (S.mic) { definirMic(false); toast('O organizador silenciou seu microfone.'); }
-  }
-  if (!S.podeFalar && S.mic) { definirMic(false); toast('O organizador controla os microfones. Use o botão da mão para pedir a palavra.'); }
-  if (S.podeFalar && !antes && c.modo === 'controlado') {
-    S.mao = false;
-    definirMic(true);
-    toast('O organizador liberou sua palavra. Seu microfone está ligado e sua fala vai para o registro.');
-  }
+  S.podeFalar = !micBloqueado(c, S.peer);
+  if (!S.podeFalar && S.mic) definirMic(false);
+  if (antes && !S.podeFalar) toast('O organizador bloqueou seu microfone. Use a mão para pedir a palavra.');
+  if (!antes && S.podeFalar && S.dentro) { S.mao = false; toast('Seu microfone foi desbloqueado. Ligue quando quiser falar.'); }
   atualizarControles();
   renderPessoas();
 }
 async function controlar(op, alvo, extra) {
   try {
     const r = await api(Object.assign({ action: 'controle', sala: SALA, h: CHAVE, peer: S.peer, op, alvo }, extra || {}));
-    S.ctl = r.controle; renderPessoas();
+    aplicarVisual(r.controle);
+    S.ctl = Object.assign({}, S.ctl, r.controle); renderPessoas();
   } catch (e) { toast(e.message); }
 }
 
@@ -871,8 +900,16 @@ function renderDocumento() {
 function aplicarVisual(c) {
   if (!c) return;
   const mudouFixo = (S.ctl.fixado || '') !== (c.fixado || '');
-  S.ctl = Object.assign({}, S.ctl, { fixado: c.fixado || '', gravando: !!c.gravando });
+  const comecou = !S.ctl.iniciada && !!c.iniciada;
+  S.ctl = Object.assign({}, S.ctl, { fixado: c.fixado || '', gravando: !!c.gravando, iniciada: Number(c.iniciada) || 0 });
   $('recPill').classList.toggle('oculto', !c.gravando);
+  $('bIniciar').classList.toggle('oculto', !S.host || !!c.iniciada);
+  $('pillAguarda').classList.toggle('oculto', S.host || !!c.iniciada);
+  if (comecou) {
+    toast(S.host ? 'Reunião iniciada: a partir de agora as falas e o áudio vão para a ata.' : 'A reunião começou. A partir de agora as falas vão para a ata.');
+    iniciarRec();
+    if (S.host && !G.ligado && !G.pausadoManual) iniciarGravacao(true);
+  }
   if (mudouFixo) layoutGrade();
 }
 
@@ -899,7 +936,7 @@ function aplicarEspera(lista) {
 function renderPessoas() {
   const box = $('pessoas');
   if (!box) return;
-  const c = S.ctl, ctrl = c.modo === 'controlado';
+  const c = S.ctl;
   let html = '';
   if (S.host && S.espera.length) {
     html += `<div class="espera-box"><h3>Sala de espera (${S.espera.length})</h3>
@@ -910,38 +947,35 @@ function renderPessoas() {
       ${S.espera.length > 1 ? '<button class="btn-p lib cheio" data-op="admitirTodos">Admitir todos</button>' : ''}</div>`;
   }
   if (S.host) {
-    html += `<div class="modo"><p>${ctrl
-      ? 'Só fala quem você liberar. Quem receber a palavra tem o microfone ligado e a fala registrada.'
-      : 'Todos podem ligar o microfone. Quem fala no Chrome ou Edge entra no registro.'}</p>
-      <div class="seg"><button data-m="livre" class="${ctrl ? '' : 'ativo'}">Microfones livres</button><button data-m="controlado" class="${ctrl ? 'ativo' : ''}">Controlados por mim</button></div>
-      <button class="btn-p blo cheio" data-op="silenciarTodos">Silenciar todos</button></div>`;
+    html += `<div class="modo"><p>${c.todos
+      ? 'Microfones bloqueados: só fala quem você desbloquear. Os pedidos de palavra (✋) aparecem aqui.'
+      : 'Cada pessoa liga e desliga o próprio microfone. Você pode bloquear um a um ou todos de uma vez.'}</p>
+      <div class="linha-bt"><button class="btn-p blo" data-op="bloquearTodos">Bloquear todos</button><button class="btn-p lib" data-op="desbloquearTodos">Desbloquear todos</button></div>
+      ${c.iniciada ? '' : '<p style="margin:10px 0 0">A reunião ainda não foi iniciada: nada está sendo registrado.</p>'}</div>`;
   }
   const lista = S.presenca.length ? S.presenca : [{ id: S.peer, nome: S.nome, host: S.host, estado: { mic: S.mic, sr: !!SR } }];
   const ord = [...lista].sort((a, b) => (b.host - a.host) || ((b.estado || {}).mao ? 1 : 0) - ((a.estado || {}).mao ? 1 : 0));
   html += ord.map(p => {
     const e = p.estado || {}, eu = p.id === S.peer;
-    const liberado = p.host || !ctrl || !!c.lib[p.id];
+    const bloqueado = !p.host && micBloqueado(c, p.id);
     const selos = [];
     if (p.host) selos.push('<span class="selo">organização</span>');
     if (e.mao) selos.push('<span class="selo mao">✋ pediu a palavra</span>');
-    if (ctrl && !p.host) selos.push(liberado ? '<span class="selo ok">com a palavra</span>' : '<span class="selo">aguardando</span>');
-    selos.push(e.mic ? '<span class="selo ok">microfone ligado</span>' : '<span class="selo">microfone desligado</span>');
-    if (S.ctl.gravando) { if (e.mic) selos.push('<span class="selo ok">voz na gravação</span>'); }
-    else if (e.sr === false) selos.push('<span class="selo alerta">fala não registrada (navegador)</span>');
-    else if (e.mic && e.sr) selos.push('<span class="selo ok">registrando</span>');
+    if (bloqueado) selos.push('<span class="selo blq">🔒 microfone bloqueado</span>');
+    else selos.push(e.mic ? '<span class="selo ok">microfone ligado</span>' : '<span class="selo">microfone desligado</span>');
+    if (e.voz === 'sem') selos.push('<span class="selo alerta">fala não registrada (aparelho)</span>');
+    else if (c.iniciada && e.mic && !bloqueado) selos.push(`<span class="selo ok">${e.voz === 'ia' ? 'registrando pela IA' : 'registrando'}</span>`);
     let botoes = '';
     if (S.host && !eu && !p.host) {
       botoes += `<button class="btn-p" data-op="fixar" data-alvo="${esc(S.ctl.fixado === p.id ? '' : p.id)}">${S.ctl.fixado === p.id ? 'Desafixar' : 'Fixar'}</button>`;
-      if (ctrl) botoes += liberado
-        ? `<button class="btn-p blo" data-op="bloquear" data-alvo="${esc(p.id)}">Encerrar palavra</button>`
-        : `<button class="btn-p lib" data-op="liberar" data-alvo="${esc(p.id)}">Liberar palavra</button>`;
-      else if (e.mic) botoes += `<button class="btn-p blo" data-op="silenciar" data-alvo="${esc(p.id)}">Silenciar</button>`;
+      botoes += bloqueado
+        ? `<button class="btn-p lib" data-op="desbloquear" data-alvo="${esc(p.id)}">Desbloquear</button>`
+        : `<button class="btn-p blo" data-op="bloquear" data-alvo="${esc(p.id)}">Bloquear</button>`;
     }
     return `<div class="pessoa"><span class="ini">${esc(iniciais(p.nome))}</span>
       <span class="info"><b>${esc(p.nome)}${eu ? ' (você)' : ''}</b><span class="selos">${selos.join('')}</span></span>${botoes}</div>`;
   }).join('');
   box.innerHTML = html;
-  box.querySelectorAll('[data-m]').forEach(b => b.onclick = () => controlar('modo', '', { modo: b.dataset.m }));
   box.querySelectorAll('[data-op]').forEach(b => b.onclick = () => controlar(b.dataset.op, b.dataset.alvo || ''));
 }
 function verificarMaos() {
@@ -989,7 +1023,7 @@ async function ciclo() {
   if (!S.dentro || S.fim) return;
   const corpo = {
     action: 'sync', sala: SALA, peer: S.peer, nome: S.nome, cargo: S.cargo,
-    estado: { mic: S.mic, cam: S.cam || !!S.tela, tela: !!S.tela, sr: !!SR && !S.recBloqueado, mao: S.mao },
+    estado: { mic: S.mic, cam: S.cam || !!S.tela, tela: !!S.tela, voz: modoVoz(), mao: S.mao },
     sinais: [], falas: pegarFalas(), ultimaSeq: S.ultimaSeq, chat: pegarChat(), ultimoChat: S.ultimoChat
   };
   try {
@@ -1160,7 +1194,7 @@ function layoutGrade() {
     return;
   }
   g.classList.remove('destaque');
-  const cols = n <= 1 ? 1 : n <= 4 ? 2 : n <= 9 ? 3 : 4;
+  const cols = mobile() ? (n <= 2 ? 1 : 2) : (n <= 1 ? 1 : n <= 4 ? 2 : n <= 9 ? 3 : 4);
   g.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
   g.style.gridTemplateRows = `repeat(${Math.ceil(n / cols)}, minmax(0, 1fr))`;
 }
@@ -1286,16 +1320,17 @@ function enviarGravacao(seg, ini, dur, blob, falantes) {
   }).finally(() => { G.pendentes--; });
   return G.fila;
 }
-async function subirParte(dados) {
+function subirParte(dados) { return subirAudio({ action: 'gravParte', sala: SALA, h: CHAVE }, dados); }
+async function subirAudio(cab, dados) {
   if (!G.semPost) {
     try {
       const r = await fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(Object.assign({ action: 'gravParte', sala: SALA, h: CHAVE }, dados)) });
+        body: JSON.stringify(Object.assign({}, cab, dados)) });
       const j = JSON.parse(await r.text());
       if (!j.ok) throw new Error(j.erro || 'falha');
       return j;
     } catch (e) {
-      if (/falha|Failed|JSON|Unexpected/.test(e.message)) G.semPost = true; else throw e;
+      if (/falha|Failed|JSON|Unexpected|Load failed|NetworkError/.test(e.message)) G.semPost = true; else throw e;
     }
   }
   // alternativa: envia em pedaços pequenos, pelo mesmo caminho do resto da sala
@@ -1304,9 +1339,9 @@ async function subirParte(dados) {
   let r = null;
   for (let i = 0; i < n; i += 4) {
     const lote = [];
-    for (let k = i; k < Math.min(n, i + 4); k++) lote.push(api({ action: 'gravPedaco', sala: SALA, h: CHAVE, id, i: k, n, txt: txt.slice(k * TAM, (k + 1) * TAM) }));
+    for (let k = i; k < Math.min(n, i + 4); k++) lote.push(api({ action: 'gravPedaco', sala: SALA, h: CHAVE, peer: S.peer, id, i: k, n, txt: txt.slice(k * TAM, (k + 1) * TAM) }));
     const rs = await Promise.all(lote);
-    rs.forEach(x => { if (x && x.seg) r = x; });
+    rs.forEach(x => { if (x && (x.seg || x.texto !== undefined || x.vazio || x.ignorado || x.semIA)) r = x; });
   }
   return r;
 }
@@ -1315,8 +1350,18 @@ window.addEventListener('beforeunload', ev => {
 });
 
 /* ================= Transcrição ================= */
+const MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+// Como a fala desta pessoa vira texto: 'navegador' (Chrome/Edge no computador), 'ia' (grava trechos e a IA escreve) ou 'sem'
+function modoVoz() {
+  if (SR && !MOBILE && !S.recBloqueado) return 'navegador';
+  if (window.MediaRecorder) return 'ia';
+  return 'sem';
+}
 function iniciarRec() {
-  if (!SR || !S.mic || !S.dentro || S.fim || S.recAtivo || S.recBloqueado) return;
+  if (!S.mic || !S.dentro || S.fim || !S.ctl.iniciada || !S.podeFalar) return;
+  const mv = modoVoz();
+  if (mv === 'ia') return iniciarVoz();
+  if (mv !== 'navegador' || S.recAtivo) return;
   const rec = new SR();
   rec.lang = 'pt-BR'; rec.continuous = true; rec.interimResults = true; rec.maxAlternatives = 1;
   rec.onresult = ev => {
@@ -1330,9 +1375,9 @@ function iniciarRec() {
   };
   rec.onerror = ev => {
     if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') {
+      // o navegador recusou: passa a usar a IA
       S.recBloqueado = true;
-      $('avisoSR').textContent = 'A transcrição foi bloqueada pelo navegador. Permita o microfone para esta página e recarregue.';
-      $('avisoSR').classList.remove('oculto');
+      if (S.mic && window.MediaRecorder) iniciarVoz();
     }
   };
   rec.onend = () => {
@@ -1341,7 +1386,91 @@ function iniciarRec() {
   };
   try { rec.start(); S.rec = rec; S.recAtivo = true; } catch (e) { S.recAtivo = false; }
 }
-function pararRec() { if (S.rec) { try { S.rec.stop(); } catch (e) {} } }
+
+/* ---------- Fala escrita pela IA (celular, Safari, Firefox) ----------
+   Quando a pessoa abre o microfone, grava só a voz dela em trechos curtos, cortando nas pausas.
+   Trechos sem fala são descartados no próprio aparelho. Cada trecho vira texto no servidor. */
+const V = { ctx: null, an: null, buf: null, faixa: null, rec: null, info: null, ini: 0, silencio: 0, timer: null, ativo: false, pendentes: 0, fila: Promise.resolve() };
+function prepararVozCtx() {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!V.ctx && AC) { try { V.ctx = new AC(); } catch (e) { V.ctx = null; } }
+}
+function iniciarVoz() {
+  if (V.ativo || !window.MediaRecorder) return;
+  const faixa = S.stream.getAudioTracks()[0];
+  if (!faixa) return;
+  V.ativo = true;
+  if (V.ctx) {
+    try {
+      V.ctx.resume();
+      if (V.faixa !== faixa) {
+        const src = V.ctx.createMediaStreamSource(new MediaStream([faixa]));
+        V.an = V.ctx.createAnalyser(); V.an.fftSize = 512; V.buf = new Float32Array(512);
+        src.connect(V.an); V.faixa = faixa;
+      }
+    } catch (e) { V.an = null; }
+  }
+  novoTrechoVoz();
+  clearInterval(V.timer);
+  V.timer = setInterval(medirVoz, 200);
+}
+function novoTrechoVoz() {
+  const tipos = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/ogg;codecs=opus', 'audio/webm'];
+  const mime = tipos.find(m => MediaRecorder.isTypeSupported(m)) || '';
+  const faixa = S.stream.getAudioTracks()[0];
+  let rec;
+  try { rec = new MediaRecorder(new MediaStream([faixa]), mime ? { mimeType: mime, audioBitsPerSecond: 16000 } : { audioBitsPerSecond: 16000 }); }
+  catch (e) { V.ativo = false; clearInterval(V.timer); return; }
+  const pedacos = [], ini = Date.now(), info = { fala: 0 };
+  rec.ondataavailable = e => { if (e.data && e.data.size) pedacos.push(e.data); };
+  rec.onstop = () => {
+    if (info.fala < 700 && V.an) return;            // só silêncio: não envia
+    const blob = new Blob(pedacos, { type: rec.mimeType || mime || 'audio/webm' });
+    if (blob.size > 1500) enviarVoz(blob, ini, Date.now() - ini);
+  };
+  rec.start(1000);
+  V.rec = rec; V.info = info; V.ini = ini; V.silencio = 0;
+}
+function medirVoz() {
+  if (!V.rec) return;
+  const dur = Date.now() - V.ini;
+  let falando = true;
+  if (V.an) {
+    V.an.getFloatTimeDomainData(V.buf);
+    let soma = 0;
+    for (let i = 0; i < V.buf.length; i++) soma += V.buf[i] * V.buf[i];
+    falando = Math.sqrt(soma / V.buf.length) > 0.02;
+  }
+  if (falando) { V.info.fala += 200; V.silencio = 0; } else V.silencio += 200;
+  if (V.an) {
+    if ((V.info.fala >= 1500 && V.silencio >= 1200 && dur >= 3000) || dur >= 25000) cortarVoz(true);
+    else if (V.info.fala === 0 && dur >= 10000) cortarVoz(true);
+  } else if (dur >= 15000) cortarVoz(true);
+}
+function cortarVoz(continuar) {
+  const r = V.rec;
+  V.rec = null;
+  if (continuar && V.ativo) novoTrechoVoz();
+  try { if (r) r.stop(); } catch (e) {}
+}
+function pararVoz() {
+  if (!V.ativo) return;
+  V.ativo = false;
+  clearInterval(V.timer);
+  cortarVoz(false);
+}
+function enviarVoz(blob, ini, dur) {
+  V.pendentes++;
+  mostrarParcial('escrevendo sua fala…');
+  V.fila = V.fila.then(async () => {
+    const dados = { tipo: 'fala', mime: blob.type, t0: ini, dur, b64: await blobParaBase64(blob) };
+    for (let t = 0; t < 3; t++) {
+      try { await subirAudio({ action: 'falaAudio', sala: SALA, peer: S.peer }, dados); break; }
+      catch (e) { if (t === 2) toast('Um trecho da sua fala não foi escrito: ' + e.message); else await pausa(8000 * (t + 1)); }
+    }
+  }).finally(() => { V.pendentes--; if (!V.pendentes) mostrarParcial(''); });
+}
+function pararRec() { if (S.rec) { try { S.rec.stop(); } catch (e) {} } pararVoz(); }
 function arrumar(t) {
   t = String(t || '').trim();
   if (!t) return '';
